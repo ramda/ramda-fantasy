@@ -1,4 +1,4 @@
 ramda-fantasy
 =============
 
-Fantasy-Land compatibile types for easy integration with Ramda.js
+Fantasy-Land compatible types for easy integration with Ramda.js
