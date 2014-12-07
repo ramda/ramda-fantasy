@@ -1,0 +1,19 @@
+{
+  "author": "Michael Hurley <mh@buzzdecafe.com> (buzzdecafe.com)",
+  "name": "ramda-fantasy",
+  "description": "Fantasy Land compatible types for easy integration with Ramda",
+  "version": "0.8.0",
+  "homepage": "https://www.github.com/ramda/ramda-fantasy",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ramda/ramda-fantasy.git"
+  },
+  "scripts": {
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "uglify-js": "2.4.x",
+    "xyz": "0.5.x"
+  }
+}
