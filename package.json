@@ -10,9 +10,13 @@
     "url": "git://github.com/ramda/ramda-fantasy.git"
   },
   "scripts": {
+    "test": "mocha"
   },
-  "dependencies": {},
+  "dependencies": {
+    "ramda": "^0.9.1"
+  },
   "devDependencies": {
+    "mocha": "^2.1.0",
     "uglify-js": "2.4.x",
     "xyz": "0.5.x"
   }
