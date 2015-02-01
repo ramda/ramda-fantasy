@@ -1,7 +1,7 @@
 var assert = require('assert');
 var types = require('./types');
 
-var IO = require('../src/IO');
+var IO = require('..').IO;
 
 function add(a) {
     return function(b) { return a + b; };

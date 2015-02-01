@@ -1,7 +1,7 @@
 var assert = require('assert');
 var types = require('./types');
 
-var Identity = require('../src/Identity');
+var Identity = require('..').Identity;
 
 describe('Identity', function() {
     var m = Identity(1);

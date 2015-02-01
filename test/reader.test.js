@@ -1,7 +1,7 @@
 var assert = require('assert');
 var types = require('./types');
 
-var Reader = require('../src/Reader');
+var Reader = require('..').Reader;
 
 function add(a) {
       return function(b) { return a + b; };
