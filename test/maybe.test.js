@@ -1,3 +1,4 @@
+var R = require('ramda');
 var assert = require('assert');
 var types = require('./types');
 
