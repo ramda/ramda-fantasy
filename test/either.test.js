@@ -1,7 +1,7 @@
 var assert = require('assert');
 var types = require('./types');
 
-var Either = require('../src/Either');
+var Either = require('..').Either;
 
 describe('Either', function() {
     var e = Either('original left', 1);
