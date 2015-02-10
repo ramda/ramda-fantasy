@@ -1,9 +1,10 @@
-
-var interfaces = {functor: ['map']};
-interfaces.apply = interfaces.functor.concat(['ap']);
-interfaces.applicative = interfaces.apply.concat(['of']);
-interfaces.chain = interfaces.apply.concat(['chain']);
-interfaces.monad = interfaces.chain.concat(['of']);
+var interfaces = {
+    functor:        ['map'],
+    apply:          ['map', 'ap'],
+    applicative:    ['map', 'ap', 'of'],
+    chain:          ['map', 'ap', 'chain'],
+    monad:          ['map', 'ap', 'chain', 'of']
+};
 
 function correctInterface(type) {
     return function(obj) {
