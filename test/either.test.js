@@ -4,7 +4,7 @@ var types = require('./types');
 var Either = require('..').Either;
 
 describe('Either', function() {
-    var e = Either('original left', 1);
+    var e = Either.fromNullable('original left', 1);
 
     function mult(a) {
         return function(b) { return a * b; };
@@ -23,9 +23,9 @@ describe('Either', function() {
 
     it('is an Apply', function() {
         var aTest = types.apply;
-        var appA = Either('apply test fn a', mult(10));
-        var appU = Either('apply test fn u', add(5));
-        var appV = Either('apply test value v', 10);
+        var appA = Either.fromNullable('apply test fn a', mult(10));
+        var appU = Either.fromNullable('apply test fn u', add(5));
+        var appV = Either.fromNullable('apply test value v', 10);
 
         assert.equal(true, aTest.iface(appA));
         assert.equal(true, aTest.compose(appA, appU, appV));
@@ -33,9 +33,9 @@ describe('Either', function() {
 
     it('is an Applicative', function() {
         var aTest = types.applicative;
-        var app1 = Either('app1', 101);
-        var app2 = Either('app2', -123);
-        var appF = Either('appF', mult(3));
+        var app1 = Either.fromNullable('app1', 101);
+        var app2 = Either.fromNullable('app2', -123);
+        var appF = Either.fromNullable('appF', mult(3));
 
         assert.equal(true, aTest.iface(app1));
         assert.equal(true, aTest.id(app1, app2));
@@ -45,8 +45,8 @@ describe('Either', function() {
 
     it('is a Chain', function() {
         var cTest = types.chain;
-        var f1 = function(x) {return Either('f1', (3 * x));};
-        var f2 = function(x) {return Either('f2', (5 + x));};
+        var f1 = function(x) {return Either.fromNullable('f1', (3 * x));};
+        var f2 = function(x) {return Either.fromNullable('f2', (5 + x));};
 
         assert.equal(true, cTest.iface(e));
         assert.equal(true, cTest.associative(e, f1, f2));
