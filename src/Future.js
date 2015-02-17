@@ -40,10 +40,3 @@ Future.prototype.chain = function(f) {  // Sorella's:
 // monad
 // A value that implements the Monad specification must also implement the Applicative and Chain specifications.
 // see above.
-
-// equality method to enable testing
-Future.prototype.equals = function(that) {
-    void that;
-    // TODO: how do you define equality for two Futures?
-    return true;
-};
