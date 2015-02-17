@@ -7,7 +7,7 @@ Future.prototype.equals = function(b) {
   var isEqual;
   this.fork(function(e1) {
     b.fork(function(e2) {
-      isEqual = e1 === e2;
+      assert.equal(v1, v2);
     }, function() {
       assert.fail(null, e1, 'Futures not equal: f1 failed, f2 did not', '===');
     })
@@ -15,10 +15,10 @@ Future.prototype.equals = function(b) {
     b.fork(function() {
       assert.fail(null, v1, 'Futures not equal: f1 succeeded, f2 did not', '===');
     }, function(v2) {
-      isEqual = v1 === v2;
+      assert.equal(v1, v2);
     });
   });
-  return isEqual;
+  return true;
 };
 
 describe('Future', function() {
@@ -72,6 +72,19 @@ describe('Future', function() {
         var mTest = types.monad;
         var f = Future.of(null);
         assert.equal(true, mTest.iface(f));
+    });
+
+    it('.map should work according to the functor specification', function() {
+      var result = Future.of(1).map(R.inc);
+      assert.equal(true, Future.of(2).equals(result));
+    });
+
+    it('.chain should work according to the chainable specification', function() {
+      var incInTheFuture = function(val) {
+        return Future.of(R.inc(val));
+      }
+      var result = Future.of(1).chain(incInTheFuture);
+      assert.equal(true, Future.of(2).equals(result));
     });
 
 });
