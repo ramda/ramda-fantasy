@@ -1,24 +1,20 @@
 module.exports = Reader;
 
-function Reader(fn) {
+function Reader(run) {
     if (!(this instanceof Reader)) {
-        return new Reader(fn);
+        return new Reader(run);
     }
-    this.fn = fn;
+    this.run = run;
 }
 
 Reader.run = function(reader) {
     return reader.run.apply(reader, [].slice.call(arguments, 1));
 };
 
-Reader.prototype.run = function() {
-    return this.fn.apply(this, arguments);
-};
-
 Reader.prototype.chain = function(f) {
     var reader = this;
     return new Reader(function() {
-        return f(reader.fn()).fn();
+        return f(reader.run()).run();
     });
 };
 
@@ -47,6 +43,6 @@ Reader.ask = Reader(function(a) {
 
 Reader.prototype.equals = function(that) {
     return this === that ||
-    this.fn === that.fn ||
+    this.run === that.run ||
     Reader.run(this) === Reader.run(that);
 };
