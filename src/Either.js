@@ -1,7 +1,16 @@
 var util = require('./internal/util');
 
-function Either() {
-    throw new Error('Either is not directly callable');
+function Either(left, right) {
+    switch (arguments.length) {
+        case 0:
+            throw new TypeError('no arguments to Either.fromNullable');
+        case 1:
+            return function(right) {
+                return right == null ? Either.Left(left) : Either.Right(right);
+            };
+        default:
+            return right == null ? Either.Left(left) : Either.Right(right);
+    }
 }
 
 Either.prototype.map = util.returnThis;
@@ -52,18 +61,5 @@ Either.Left = function(value) {
     return new _Left(value);
 };
 
-
-Either.fromNullable = function(left, right) {
-    switch (arguments.length) {
-        case 0:
-            throw new TypeError('no arguments to Either.fromNullable');
-        case 1:
-            return function(right) {
-                return right == null ? Either.Left(left) : Either.Right(right);
-            };
-        default:
-            return right == null ? Either.Left(left) : Either.Right(right);
-    }
-}
 
 module.exports = Either;

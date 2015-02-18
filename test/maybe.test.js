@@ -5,8 +5,8 @@ var types = require('./types');
 var Maybe = require('..').Maybe;
 
 describe('Maybe', function() {
-    var m = Maybe.fromNullable(1);
-    var nada = Maybe.fromNullable(null);
+    var m = Maybe(1);
+    var nada = Maybe(null);
 
     function mult(a) {
         return function(b) { return a * b; };
@@ -29,9 +29,9 @@ describe('Maybe', function() {
 
     it('is an Apply', function() {
         var aTest = types.apply;
-        var appA = Maybe.fromNullable(mult(10));
-        var appU = Maybe.fromNullable(add(7));
-        var appV = Maybe.fromNullable(10);
+        var appA = Maybe(mult(10));
+        var appU = Maybe(add(7));
+        var appV = Maybe(10);
 
         assert.equal(true, aTest.iface(appA));
         assert.equal(true, aTest.compose(appA, appU, appV));
@@ -40,9 +40,9 @@ describe('Maybe', function() {
 
     it('is an Applicative', function() {
         var aTest = types.applicative;
-        var app1 = Maybe.fromNullable(101);
-        var app2 = Maybe.fromNullable(-123);
-        var appF = Maybe.fromNullable(R.multiply(3));
+        var app1 = Maybe(101);
+        var app2 = Maybe(-123);
+        var appF = Maybe(R.multiply(3));
 
         assert.equal(true, aTest.iface(app1));
         assert.equal(true, aTest.id(app1, app2));
@@ -51,7 +51,7 @@ describe('Maybe', function() {
         assert.equal(true, aTest.interchange(app2, appF, 17));
 
         assert.equal(true, aTest.iface(nada));
-        assert.equal(true, aTest.id(nada, Maybe.fromNullable(null)));
+        assert.equal(true, aTest.id(nada, Maybe(null)));
         assert.equal(true, aTest.homomorphic(nada, add(3), 46));
         assert.equal(true, aTest.interchange(nada, appF, 17));
 
@@ -59,9 +59,9 @@ describe('Maybe', function() {
 
     it('is a Chain', function() {
         var cTest = types.chain;
-        var f1 = function(x) {return Maybe.fromNullable(3 * x);};
-        var f2 = function(x) {return Maybe.fromNullable(5 + x);};
-        var fNull = function() {return Maybe.fromNullable(null);};
+        var f1 = function(x) {return Maybe(3 * x);};
+        var f2 = function(x) {return Maybe(5 + x);};
+        var fNull = function() {return Maybe(null);};
         assert.equal(true, cTest.iface(m));
         assert.equal(true, cTest.associative(m, f1, f2));
         assert.equal(true, cTest.iface(nada));

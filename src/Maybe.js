@@ -1,7 +1,7 @@
 var util = require('./internal/util.js');
 
 function Maybe(x) {
-    throw new Error('Maybe cannot be directly instantiated.');
+    return x == null ? _nothing : Maybe.Just(x);
 };
 
 function _Just(x) {
@@ -20,10 +20,6 @@ Maybe.Nothing = function() {
 
 Maybe.Just = function(x) {
     return new _Just(x);
-};
-
-Maybe.fromNullable = function(x) {
-    return x == null ? _nothing : Maybe.Just(x);
 };
 
 Maybe.of = Maybe.Just;
