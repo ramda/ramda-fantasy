@@ -8,9 +8,9 @@ ramda-fantasy
 [2]: https://github.com/ramda/ramda
 
 ## Project status
-This project is considered to have alpha status. While the implementation of
-the fantasy land spec could be said to be stable, the non fantasy land methods are
-subject to change. The types also have not undergone thurough testing/use yet.
+This project is in alpha status. The implementation of the Fantasy Land spec should be *mostly* 
+stable. Any methods outside of the Fantasy Land spec are subject to change. The types also have 
+not undergone thorough testing/use yet.
 
 ## Available types
 
