@@ -14,12 +14,14 @@ not undergone thorough testing/use yet.
 
 ## Available types
 
- * Either
- * Future
- * Identity
- * IO
- * Maybe
- * Reader
+ Name       | Setoid  | Monoid | Monad |  Comonad
+ ---------- | :-----: | :----: | :---: |  :-----:
+ Either     |  **✔︎**  |        | **✔︎** |
+ Future     |         |        | **✔︎** |
+ Identity   |  **✔︎**  |        | **✔︎** |
+ IO         |  **✔︎**  |        | **✔︎** |
+ Maybe      |  **✔︎**  |        | **✔︎** |
+ Reader     |  **✔︎**  |        | **✔︎** |
 
 Access like so:
 ```
