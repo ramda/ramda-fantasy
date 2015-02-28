@@ -93,3 +93,29 @@ describe('Maybe', function() {
     });
 
 });
+
+describe('Maybe usage', function() {
+
+  it('should allow the user to check if the instance is a Nothing', function() {
+    assert.equal(true, Maybe(null).isNothing());
+    assert.equal(false, Maybe(42).isNothing());
+  });
+
+  it('should allow the user to check if the instance is a Just', function() {
+    assert.equal(true, Maybe(42).isJust());
+    assert.equal(false, Maybe(null).isJust());
+  });
+
+  describe('#getOrElse', function() {
+
+    it('should return the contained value for if the instance is a Just', function() {
+      assert.equal(42, Maybe(42).getOrElse(24));
+    });
+
+    it('should return the input value if the instance is a Nothing', function() {
+      assert.equal(24, Maybe(null).getOrElse(24));
+    });
+
+  });
+
+});

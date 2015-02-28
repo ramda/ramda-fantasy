@@ -74,5 +74,21 @@ _Nothing.prototype.equals = function(that) {
     return that === _nothing;
 };
 
+Maybe.prototype.isNothing = function() {
+  return this === _nothing;
+};
+
+Maybe.prototype.isJust = function() {
+  return this instanceof _Just;
+};
+
+_Just.prototype.getOrElse = function(a) {
+  return this.value;
+};
+
+_Nothing.prototype.getOrElse = function(a) {
+  return a;
+};
+
 module.exports = Maybe;
 
