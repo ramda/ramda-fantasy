@@ -41,7 +41,7 @@ _Just.prototype.ap = function(m) {
     return m.map(this.value);
 };
 
-_Nothing.prototype.ap = util.identity;
+_Nothing.prototype.ap = util.returnThis;
 
 // applicative
 // `of` inherited from `Maybe`
@@ -56,7 +56,7 @@ _Just.prototype.chain = util.baseMap;
 _Nothing.prototype.chain = util.returnThis;
 
 
-// 
+//
 _Just.prototype.datatype = _Just;
 
 _Nothing.prototype.datatype = _Nothing;
