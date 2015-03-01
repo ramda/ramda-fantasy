@@ -1,12 +1,43 @@
 var R = require('ramda');
 var assert = require('assert');
 var types = require('./types');
+var jsv = require('jsverify');
 
 var Maybe = require('..').Maybe;
 
+var MaybeGen = R.curry(function(a, n) {
+    return n % 2 == 0 ? Maybe.Just(a.generator(n)) : Maybe.Nothing();
+});
+
+var MaybeShow = R.curry(function(a, m) {
+    if (m instanceof Maybe.Just) {
+        return "Just(" + a.show(m.value) + ")";
+    } else {
+        return "Nothing";
+    }
+});
+
+var MaybeShrink = R.curry(function(a, m) {
+    if (m instanceof Maybe.Just) {
+        return [Maybe.Nothing()].concat(a.shrink(m.value).map(Maybe.Just));
+    } else {
+        return [];
+    }
+});
+
+var MaybeArb = function(a) {
+    return {
+        generator: jsv.generator.bless(MaybeGen(a)),
+        show: MaybeShow(a),
+        shrink: jsv.shrink.bless(MaybeShrink(a))
+    };
+};
+
 describe('Maybe', function() {
-    var m = Maybe(1);
-    var nada = Maybe(null);
+    var m = MaybeArb(jsv.nat);
+    var env = {Maybe: MaybeArb};
+    var appF = 'Maybe (nat -> nat)';
+    var appN = 'Maybe nat';
 
     function mult(a) {
         return function(b) { return a * b; };
@@ -16,63 +47,49 @@ describe('Maybe', function() {
         return function(b) { return a + b; };
     }
 
+    it('has an arbitrary', function() {
+        var arb = jsv.forall(m, function(m) {
+            return m instanceof Maybe;
+        });
+        jsv.assert(arb);
+    });
 
     it('is a Functor', function() {
         var fTest = types.functor;
-        assert.equal(true, fTest.iface(m));
-        assert.equal(true, fTest.id(m));
-        assert.equal(true, fTest.compose(m, mult(2), add(3)));
-        assert.equal(true, fTest.iface(nada));
-        assert.equal(true, fTest.id(nada));
-        assert.equal(true, fTest.compose(nada, mult(2), add(3)));
+
+        jsv.assert(jsv.forall(m, fTest.iface));
+        jsv.assert(jsv.forall(m, fTest.id));
+        jsv.assert(jsv.forall(m, 'nat -> nat', 'nat -> nat', fTest.compose));
     });
 
     it('is an Apply', function() {
         var aTest = types.apply;
-        var appA = Maybe(mult(10));
-        var appU = Maybe(add(7));
-        var appV = Maybe(10);
 
-        assert.equal(true, aTest.iface(appA));
-        assert.equal(true, aTest.compose(appA, appU, appV));
-        assert.equal(true, aTest.iface(nada));
+        jsv.assert(jsv.forall(m, aTest.iface));
+        jsv.assert(jsv.forall(appF, appF, appN, env, aTest.compose));
     });
 
     it('is an Applicative', function() {
         var aTest = types.applicative;
-        var app1 = Maybe(101);
-        var app2 = Maybe(-123);
-        var appF = Maybe(R.multiply(3));
 
-        assert.equal(true, aTest.iface(app1));
-        assert.equal(true, aTest.id(app1, app2));
-        assert.equal(true, aTest.id(app1, nada));
-        assert.equal(true, aTest.homomorphic(app1, add(3), 46));
-        assert.equal(true, aTest.interchange(app2, appF, 17));
-
-        assert.equal(true, aTest.iface(nada));
-        assert.equal(true, aTest.id(nada, Maybe(null)));
-        assert.equal(true, aTest.homomorphic(nada, add(3), 46));
-        assert.equal(true, aTest.interchange(nada, appF, 17));
-
+        jsv.assert(jsv.forall(m, aTest.iface));
+        jsv.assert(jsv.forall(appN, appN, env, aTest.id));
+        jsv.assert(jsv.forall(appN, 'nat -> nat', 'nat', env, aTest.homomorphic));
+        jsv.assert(jsv.forall(appN, appF, 'nat', env, aTest.interchange));
     });
 
     it('is a Chain', function() {
         var cTest = types.chain;
-        var f1 = function(x) {return Maybe(3 * x);};
-        var f2 = function(x) {return Maybe(5 + x);};
-        var fNull = function() {return Maybe(null);};
-        assert.equal(true, cTest.iface(m));
-        assert.equal(true, cTest.associative(m, f1, f2));
-        assert.equal(true, cTest.iface(nada));
-        assert.equal(true, cTest.associative(m, fNull, f2));
-        assert.equal(true, cTest.associative(m, f1, fNull));
-        assert.equal(true, cTest.associative(m, fNull, fNull));
+        var f = 'nat -> Maybe nat'
+
+        jsv.assert(jsv.forall(m, cTest.iface));
+        jsv.assert(jsv.forall(m, f, f, env, cTest.associative));
     });
 
     it('is a Monad', function() {
         var mTest = types.monad;
-        assert.equal(true, mTest.iface(m));
+
+        jsv.assert(jsv.forall(m, mTest.iface));
     });
 
 });
