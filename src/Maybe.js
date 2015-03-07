@@ -26,6 +26,13 @@ Maybe.of = Maybe.Just;
 
 Maybe.prototype.of = Maybe.Just;
 
+Maybe.isJust = function(x) {
+    return x instanceof _Just;
+};
+
+Maybe.isNothing = function(x) {
+    return x === _nothing;
+};
 
 // functor
 _Just.prototype.map = function(f) {

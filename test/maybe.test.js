@@ -10,19 +10,15 @@ var MaybeGen = R.curry(function(a, n) {
 });
 
 var MaybeShow = R.curry(function(a, m) {
-    if (m instanceof Maybe.Just) {
-        return "Just(" + a.show(m.value) + ")";
-    } else {
-        return "Nothing";
-    }
+    return (Maybe.isJust(m)) ?
+        "Just(" + a.show(m.value) + ")" :
+        "Nothing";
 });
 
 var MaybeShrink = R.curry(function(a, m) {
-    if (m instanceof Maybe.Just) {
-        return [Maybe.Nothing()].concat(a.shrink(m.value).map(Maybe.Just));
-    } else {
-        return [];
-    }
+    return (Maybe.isJust(m)) ?
+        [Maybe.Nothing()].concat(a.shrink(m.value).map(Maybe.Just)) :
+        [];
 });
 
 var MaybeArb = function(a) {
@@ -96,14 +92,25 @@ describe('Maybe', function() {
 
 describe('Maybe usage', function() {
 
-  it('should allow the user to check if the instance is a Nothing', function() {
-    assert.equal(true, Maybe(null).isNothing());
-    assert.equal(false, Maybe(42).isNothing());
-  });
+  describe('checking for Just | Nothing', function() {
+    it('should allow the user to check if the instance is a Nothing', function() {
+      assert.equal(true, Maybe(null).isNothing());
+      assert.equal(false, Maybe(42).isNothing());
+    });
 
-  it('should allow the user to check if the instance is a Just', function() {
-    assert.equal(true, Maybe(42).isJust());
-    assert.equal(false, Maybe(null).isJust());
+    it('should allow the user to check if the instance is a Just', function() {
+      assert.equal(true, Maybe(42).isJust());
+      assert.equal(false, Maybe(null).isJust());
+    });
+
+    it('can check the type statically', function() {
+        var nada = Maybe.Nothing();
+        var just1 = Maybe.Just(1);
+        assert.equal(Maybe.isJust(nada), false);
+        assert.equal(Maybe.isNothing(nada), true);
+        assert.equal(Maybe.isJust(just1), true);
+        assert.equal(Maybe.isNothing(just1), false);
+    });
   });
 
   describe('#getOrElse', function() {
