@@ -87,4 +87,64 @@ describe('Future', function() {
       assert.equal(true, Future.of(2).equals(result));
     });
 
+    describe('#ap', function() {
+      var add = R.add;
+      function delayError(delay, err) {
+        return new Future(function(reject, resolve) {
+          setTimeout(reject, delay, err);
+        });
+      }
+
+      function delayValue(delay, value) {
+        return new Future(function(reject, resolve) {
+          setTimeout(resolve, delay, value);
+        });
+      }
+
+      function assertCbVal(done, expectedVal) {
+        return function(val) {
+          assert.equal(expectedVal, val);
+          done();
+        }
+      }
+
+      it('applies its function to the passed in future', function() {
+        var f1 = Future.of(add(1));
+        var result = f1.ap(Future.of(2));
+        assert.equal(true, Future.of(3).equals(result));
+      });
+
+      it('does the apply in parallel', function(done) {
+        this.timeout(20);
+        var f1 = delayValue(15, 1);
+        var f2 = delayValue(15, 2);
+        f1.map(add).ap(f2).fork(null, assertCbVal(done, 3));
+      });
+
+      it('can handle itself being resolved first', function(done) {
+        var f1 = delayValue(1, 1);
+        var f2 = delayValue(15, 2);
+        f1.map(add).ap(f2).fork(null, assertCbVal(done, 3));
+      });
+
+      it('can handle the input future being resolved first', function(done) {
+        var f1 = delayValue(15, 1);
+        var f2 = delayValue(1, 2);
+        f1.map(add).ap(f2).fork(null, assertCbVal(done, 3));
+      });
+
+      it('is rejected with the first error to occur - case 1', function(done) {
+        var f1 = delayError(10, 'firstError');
+        var f2 = delayError(20, 'secondError');
+        f1.map(add).ap(f2).fork(assertCbVal(done, 'firstError'));
+      });
+
+      it('is rejected with the first error to occur - case 2', function(done) {
+        var f1 = delayError(20, 'firstError');
+        var f2 = delayError(10, 'secondError');
+        f1.map(add).ap(f2).fork(assertCbVal(done, 'secondError'));
+      });
+    });
+
 });
+
