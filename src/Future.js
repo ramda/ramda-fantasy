@@ -1,3 +1,4 @@
+var R = require('ramda');
 module.exports = Future;
 
 // `f` is a function that takes two function arguments: `reject` (failure) and `resolve` (success)
@@ -15,7 +16,30 @@ Future.prototype.map = function(f) {
 
 // apply
 Future.prototype.ap = function(m) {
-    return this.chain(function(f) { return m.map(f); });
+  var self = this;
+
+  return new Future(function(rej, res) {
+    var applyFn, val;
+    var doReject = R.once(rej);
+
+    function resolveIfDone() {
+      if (applyFn != null && val != null) {
+        return res(applyFn(val));
+      }
+    };
+
+    self.fork(doReject, function(fn) {
+      applyFn = fn;
+      resolveIfDone();
+    });
+
+    m.fork(doReject, function(v) {
+      val = v;
+      resolveIfDone();
+    });
+
+  });
+
 };
 
 // applicative

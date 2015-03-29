@@ -13,7 +13,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "ramda": "^0.10.0"
+    "ramda": "^0.13.0"
   },
   "devDependencies": {
     "jsverify": "^0.5.1",
