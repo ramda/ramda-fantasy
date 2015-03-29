@@ -13,8 +13,8 @@ Reader.run = function(reader) {
 
 Reader.prototype.chain = function(f) {
     var reader = this;
-    return new Reader(function() {
-        return f(reader.run()).run();
+    return new Reader(function(r) {
+        return f(reader.run(r)).run(r);
     });
 };
 
