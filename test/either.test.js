@@ -56,4 +56,21 @@ describe('Either', function() {
         var mTest = types.monad;
         assert.equal(true, mTest.iface(e));
     });
+
+    describe('#bimap', function() {
+
+        it('maps the first function over the left value', function() {
+          var e = Either(1, null);
+          var result = e.bimap(add(1));
+          assert.equal(true, result.equals(Either(2, null)));
+        });
+
+        it('maps the second function over the right value', function() {
+          var e = Either(null, 1);
+          var result = e.bimap(null, add(1));
+          assert.equal(true, result.equals(Either(null, 2)));
+        });
+
+    });
+
 });
