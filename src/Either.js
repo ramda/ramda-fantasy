@@ -15,8 +15,8 @@ function Either(left, right) {
 
 Either.prototype.map = util.returnThis;
 
-Either.of = Either.prototype.of = function(value) { 
-    return Either.Right(value); 
+Either.of = Either.prototype.of = function(value) {
+    return Either.Right(value);
 };
 
 Either.prototype.chain = util.returnThis; // throw?
@@ -32,16 +32,20 @@ function _Right(x) {
 }
 util.extend(_Right, Either);
 
-_Right.prototype.map = function(fn) { 
-    return new _Right(fn(this.value)); 
+_Right.prototype.map = function(fn) {
+    return new _Right(fn(this.value));
 };
 
-_Right.prototype.ap = function(that) { 
-    return that.map(this.value); 
+_Right.prototype.ap = function(that) {
+    return that.map(this.value);
 };
 
-_Right.prototype.chain = function(f) { 
-    return f(this.value); 
+_Right.prototype.chain = function(f) {
+    return f(this.value);
+};
+
+_Right.prototype.bimap = function(_, f) {
+    return new _Right(f(this.value));
 };
 
 Either.Right = function(value) {
@@ -56,6 +60,10 @@ function _Left(x) {
 util.extend(_Left, Either);
 
 _Left.prototype.ap = function(that) { return that; };
+
+_Left.prototype.bimap = function(f) {
+    return new _Left(f(this.value));
+};
 
 Either.Left = function(value) {
     return new _Left(value);
