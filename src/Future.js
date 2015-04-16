@@ -64,3 +64,9 @@ Future.prototype.chain = function(f) {  // Sorella's:
 // monad
 // A value that implements the Monad specification must also implement the Applicative and Chain specifications.
 // see above.
+
+Future.reject = function(val) {
+    return new Future(function(reject, _) {
+        reject(val);
+    });
+};

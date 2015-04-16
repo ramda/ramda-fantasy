@@ -144,6 +144,21 @@ describe('Future', function() {
         var f2 = delayError(10, 'secondError');
         f1.map(add).ap(f2).fork(assertCbVal(done, 'secondError'));
       });
+
+    });
+
+    describe('reject', function() {
+
+      it('creates a rejected future with the given value', function() {
+        var f = Future.reject('foo');
+        var forked;
+        f.fork(function(err) {
+          forked = true;
+          assert.equal('foo', err);
+        });
+        assert.equal(true, forked);
+      });
+
     });
 
 });
