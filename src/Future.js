@@ -65,6 +65,17 @@ Future.prototype.chain = function(f) {  // Sorella's:
 // A value that implements the Monad specification must also implement the Applicative and Chain specifications.
 // see above.
 
+Future.prototype.bimap = function(errFn, successFn) {
+    var self = this;
+    return new Future(function(reject, resolve) {
+        self.fork(function(err) {
+          reject(errFn(err));
+        }, function(val) {
+          resolve(successFn(val));
+        });
+    });
+};
+
 Future.reject = function(val) {
     return new Future(function(reject, _) {
         reject(val);
