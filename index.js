@@ -4,5 +4,6 @@ module.exports = {
     Identity: require('./src/Identity'),
     IO: require('./src/IO'),
     Maybe: require('./src/Maybe'),
+    Tuple: require('./src/Tuple'),
     Reader: require('./src/Reader')
 };

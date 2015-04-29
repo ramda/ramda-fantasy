@@ -1,4 +1,6 @@
 var interfaces = {
+    semigroup:      ['concat'],
+    monoid:         ['concat', 'empty'],
     functor:        ['map'],
     apply:          ['map', 'ap'],
     applicative:    ['map', 'ap', 'of'],
@@ -17,6 +19,12 @@ function correctInterface(type) {
 function identity(x) { return x; }
 
 module.exports = {
+    semigroup: {
+        iface: correctInterface('semigroup'),
+        associative: function(a, b, c) {
+          return a.concat(b).concat(c).equals(a.concat(b.concat(c)))
+        }
+    },
 
     functor: {
         iface: correctInterface('functor'),

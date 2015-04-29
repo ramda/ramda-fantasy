@@ -14,14 +14,16 @@ not undergone thorough testing/use yet.
 
 ## Available types
 
- Name       | Setoid  | Monoid | Monad |  Comonad
- ---------- | :-----: | :----: | :---: |  :-----:
- Either     |  **✔︎**  |        | **✔︎** |
- Future     |         |        | **✔︎** |
- Identity   |  **✔︎**  |        | **✔︎** |
- IO         |  **✔︎**  |        | **✔︎** |
- Maybe      |  **✔︎**  |        | **✔︎** |
- Reader     |  **✔︎**  |        | **✔︎** |
+ Name       | Setoid  | Semigroup | Functor | Applicative | Monad | Comonad  |
+ ---------- | :-----: | :-------: | :-----: | :---------: | :---: | :------: |
+ Either     |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
+ Future     |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
+ Identity   |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
+ IO         |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
+ Maybe      |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
+ Reader     |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
+ Tuple      |  **✔︎**  |   **✔︎**   |  **✔︎**  |    **✔︎**    |       |          |
+
 
 Access like so:
 ```
