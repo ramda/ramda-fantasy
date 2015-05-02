@@ -73,9 +73,7 @@ _Nothing.prototype.datatype = _Nothing;
 // see above.
 
 // equality method to enable testing
-_Just.prototype.equals = function(that) {
-    return that instanceof _Just && this.value === that.value;
-};
+_Just.prototype.equals = util.getEquals(_Just);
 
 _Nothing.prototype.equals = function(that) {
     return that === _nothing;

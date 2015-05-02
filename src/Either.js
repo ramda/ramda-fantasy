@@ -1,9 +1,10 @@
+var eqDeep = require('ramda').eqDeep;
 var util = require('./internal/util');
 
 function Either(left, right) {
     switch (arguments.length) {
         case 0:
-            throw new TypeError('no arguments to Either.fromNullable');
+            throw new TypeError('no arguments to Either');
         case 1:
             return function(right) {
                 return right == null ? Either.Left(left) : Either.Right(right);
@@ -16,14 +17,12 @@ function Either(left, right) {
 Either.prototype.map = util.returnThis;
 
 Either.of = Either.prototype.of = function(value) {
-    return Either.Right(value);
+  return Either.Right(value);
 };
 
 Either.prototype.chain = util.returnThis; // throw?
 
-Either.equals = Either.prototype.equals = function(that) {
-    return this.constructor === that.constructor && this.value === that.value;
-};
+Either.equals = Either.prototype.equals = util.getEquals(Either);
 
 
 // Right

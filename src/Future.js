@@ -1,5 +1,4 @@
 var R = require('ramda');
-module.exports = Future;
 
 // `f` is a function that takes two function arguments: `reject` (failure) and `resolve` (success)
 function Future(f) {
@@ -81,3 +80,5 @@ Future.reject = function(val) {
         reject(val);
     });
 };
+
+module.exports = Future;
