@@ -1,4 +1,5 @@
-module.exports = Identity;
+var util = require('./internal/util');
+
 
 /**
  * A data type that holds a value and exposes a monadic api.
@@ -74,6 +75,6 @@ Identity.prototype.get = function() {
 };
 
 // equality method to enable testing
-Identity.prototype.equals = function(that) {
-    return this.value === that.value;
-};
+Identity.prototype.equals = util.getEquals(Identity);
+
+module.exports = Identity;

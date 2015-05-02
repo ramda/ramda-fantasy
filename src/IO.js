@@ -50,5 +50,5 @@ IO.of = IO.prototype.of;
 IO.prototype.equals = function(that) {
     return this === that ||
         this.fn === that.fn ||
-        IO.runIO(this) === IO.runIO(that);
+        R.eqDeep(IO.runIO(this), IO.runIO(that));
 };

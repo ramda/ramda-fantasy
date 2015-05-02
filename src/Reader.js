@@ -1,4 +1,5 @@
-module.exports = Reader;
+var R = require('ramda');
+
 
 function Reader(run) {
     if (!(this instanceof Reader)) {
@@ -44,5 +45,7 @@ Reader.ask = Reader(function(a) {
 Reader.prototype.equals = function(that) {
     return this === that ||
     this.run === that.run ||
-    Reader.run(this) === Reader.run(that);
+    R.eqDeep(Reader.run(this), Reader.run(that));
 };
+
+module.exports = Reader;

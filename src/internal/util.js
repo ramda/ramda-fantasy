@@ -1,9 +1,16 @@
+var eqDeep = require('ramda').eqDeep;
 
 
 module.exports = {
 
     baseMap: function(f) {
         return f(this.value);
+    },
+
+    getEquals: function(constructor) {
+      return function equals(that) {
+        return that instanceof constructor && eqDeep(this.value, that.value);
+      };
     },
 
     extend: function(Child, Parent) {
