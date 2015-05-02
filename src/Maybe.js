@@ -2,7 +2,7 @@ var util = require('./internal/util.js');
 
 function Maybe(x) {
     return x == null ? _nothing : Maybe.Just(x);
-};
+}
 
 function _Just(x) {
     this.value = x;
@@ -87,7 +87,7 @@ Maybe.prototype.isJust = function() {
   return this instanceof _Just;
 };
 
-_Just.prototype.getOrElse = function(a) {
+_Just.prototype.getOrElse = function() {
   return this.value;
 };
 

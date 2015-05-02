@@ -10,12 +10,15 @@
     "url": "git://github.com/ramda/ramda-fantasy.git"
   },
   "scripts": {
+    "jshint": "node_modules/.bin/jshint src/* test/*",
+    "pretest": "npm run jshint",
     "test": "mocha"
   },
   "dependencies": {
     "ramda": "^0.13.0"
   },
   "devDependencies": {
+    "jshint": "~2.7.0",
     "jsverify": "^0.5.1",
     "mocha": "^2.1.0",
     "uglify-js": "2.4.x",

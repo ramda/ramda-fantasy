@@ -12,21 +12,21 @@ function Tuple(x, y) {
         default:
             return new _Tuple(x,y);
     }
-};
+}
 
 function _Tuple(x, y) {
     this[0] = x;
     this[1] = y;
     this.length = 2;
-};
+}
 
 function ensureConcat(xs) {
     xs.forEach(function(x) {
       if(typeof x.concat != "function") {
           var display = x.show ? x.show() : x;
           throw new TypeError(display + " must be a semigroup to perform this operation");
-      };
-    })
+      }
+    });
 }
 
 Tuple.of = function(x) {
@@ -43,13 +43,13 @@ Tuple.snd = function(x) {
 
 _Tuple.prototype.of = function(x) {
     return Tuple(this[0], x);
-}
+};
 
 // semigroup
 _Tuple.prototype.concat = function(x) {
     ensureConcat([this[0], this[1]]);
-    return Tuple(this[0].concat(x[0]), this[1].concat(x[1]))
-}
+    return Tuple(this[0].concat(x[0]), this[1].concat(x[1]));
+};
 
 // functor
 _Tuple.prototype.map = function(f) {

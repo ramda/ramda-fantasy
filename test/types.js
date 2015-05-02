@@ -22,7 +22,7 @@ module.exports = {
     semigroup: {
         iface: correctInterface('semigroup'),
         associative: function(a, b, c) {
-          return a.concat(b).concat(c).equals(a.concat(b.concat(c)))
+          return a.concat(b).concat(c).equals(a.concat(b.concat(c)));
         }
     },
 

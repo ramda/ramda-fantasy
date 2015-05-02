@@ -4,13 +4,12 @@ var types = require('./types');
 var Future = require('../src/Future');
 
 Future.prototype.equals = function(b) {
-  var isEqual;
   this.fork(function(e1) {
     b.fork(function(e2) {
-      assert.equal(v1, v2);
+      assert.equal(e1, e2);
     }, function() {
       assert.fail(null, e1, 'Futures not equal: f1 failed, f2 did not', '===');
-    })
+    });
   }, function(v1) {
     b.fork(function() {
       assert.fail(null, v1, 'Futures not equal: f1 succeeded, f2 did not', '===');
@@ -82,14 +81,16 @@ describe('Future', function() {
     it('.chain should work according to the chainable specification', function() {
       var incInTheFuture = function(val) {
         return Future.of(R.inc(val));
-      }
+      };
       var result = Future.of(1).chain(incInTheFuture);
       assert.equal(true, Future.of(2).equals(result));
     });
 
     describe('#ap', function() {
+      /*jshint browser:true */
       var add = R.add;
       function delayError(delay, err) {
+        /*jshint unused:false */
         return new Future(function(reject, resolve) {
           setTimeout(reject, delay, err);
         });
@@ -105,7 +106,7 @@ describe('Future', function() {
         return function(val) {
           assert.equal(expectedVal, val);
           done();
-        }
+        };
       }
 
       it('applies its function to the passed in future', function() {
