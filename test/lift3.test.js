@@ -7,7 +7,7 @@ describe('lift3', function() {
 
   var combine3 = R.curry(function(a, b, c) {
     return [ a, b, c ].join(' ');
-  })
+  });
 
   var i1 = Identity.of('foo');
   var i2 = Identity.of('bar');

@@ -1,0 +1,10 @@
+{
+  "eqnull": true,
+  "globals": {
+    "Symbol": true
+  },
+  "newcap": false,
+  "predef": ["beforeEach", "console", "define", "describe", "it", "module", "process", "require"],
+  "undef": true,
+  "unused": true
+}

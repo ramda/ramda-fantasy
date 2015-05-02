@@ -6,7 +6,7 @@ var jsv = require('jsverify');
 var Maybe = require('..').Maybe;
 
 var MaybeGen = R.curry(function(a, n) {
-    return n % 2 == 0 ? Maybe.Just(a.generator(n)) : Maybe.Nothing();
+    return n % 2 === 0 ? Maybe.Just(a.generator(n)) : Maybe.Nothing();
 });
 
 var MaybeShow = R.curry(function(a, m) {
@@ -34,14 +34,6 @@ describe('Maybe', function() {
     var env = {Maybe: MaybeArb};
     var appF = 'Maybe (nat -> nat)';
     var appN = 'Maybe nat';
-
-    function mult(a) {
-        return function(b) { return a * b; };
-    }
-
-    function add(a) {
-        return function(b) { return a + b; };
-    }
 
     it('has an arbitrary', function() {
         var arb = jsv.forall(m, function(m) {
@@ -76,7 +68,7 @@ describe('Maybe', function() {
 
     it('is a Chain', function() {
         var cTest = types.chain;
-        var f = 'nat -> Maybe nat'
+        var f = 'nat -> Maybe nat';
 
         jsv.assert(jsv.forall(m, cTest.iface));
         jsv.assert(jsv.forall(m, f, f, env, cTest.associative));

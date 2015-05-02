@@ -1,5 +1,5 @@
-var eqDeep = require('ramda').eqDeep;
 var util = require('./internal/util');
+
 
 function Either(left, right) {
     switch (arguments.length) {

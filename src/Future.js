@@ -25,7 +25,7 @@ Future.prototype.ap = function(m) {
       if (applyFn != null && val != null) {
         return res(applyFn(val));
       }
-    };
+    }
 
     self.fork(doReject, function(fn) {
       applyFn = fn;
@@ -76,7 +76,7 @@ Future.prototype.bimap = function(errFn, successFn) {
 };
 
 Future.reject = function(val) {
-    return new Future(function(reject, _) {
+    return new Future(function(reject) {
         reject(val);
     });
 };

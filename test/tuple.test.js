@@ -7,15 +7,15 @@ var Tuple = require('..').Tuple;
 var constructor = Tuple("", "").constructor;
 
 var TupleGen = R.curry(function(a, b, n) {
-    return Tuple(a.generator(n), b.generator(n))
+    return Tuple(a.generator(n), b.generator(n));
 });
 
 var TupleShow = R.curry(function(a, m) {
-    return "Tuple(" + a.show(m[0]) + ", " + a.show(m[1]) + ")"
+    return "Tuple(" + a.show(m[0]) + ", " + a.show(m[1]) + ")";
 });
 
 var TupleShrink = R.curry(function(a, m) {
-    return [Tuple(a.shrink(m[0]), a.shrink(m[1]))]
+    return [Tuple(a.shrink(m[0]), a.shrink(m[1]))];
 });
 
 var TupleArb = function(a, b) {
@@ -34,8 +34,8 @@ var stringArb = jsv.generator.bless({
       case 2: return "quux";
     }
   },
-  show: function(a){ return a },
-  shrink: jsv.shrink.bless(function(m){ return [m.slice(1)] })
+  show: function(a){ return a; },
+  shrink: jsv.shrink.bless(function(m){ return [m.slice(1)]; })
 });
 
 function mult(a) {
@@ -52,7 +52,7 @@ describe('Tuple', function() {
 
     it('has an arbitrary', function() {
         var arb = jsv.forall(m, function(m) {
-            return m instanceof constructor
+            return m instanceof constructor;
         });
         jsv.assert(arb);
     });
@@ -108,13 +108,13 @@ describe('Tuple usage', function() {
     });
 
     it('should lift the value into the tuple as both positions', function() {
-      var tpl = Tuple.of("pillow pets")
+      var tpl = Tuple.of("pillow pets");
       assert.equal("pillow pets", tpl[0]);
       assert.equal("pillow pets", tpl[1]);
     });
 
     it('should maintain the current fst if it already has one', function() {
-      var tpl = Tuple.of(100).of("buckaroonies")
+      var tpl = Tuple.of(100).of("buckaroonies");
       assert.equal(100, tpl[0]);
       assert.equal("buckaroonies", tpl[1]);
     });
@@ -163,21 +163,21 @@ describe('Tuple usage', function() {
 
     it('only maps the snd', function() {
       var t = tuple.map(add("coco"));
-      assert.equal("mixed", t[0])
-      assert.equal("coconuts", t[1])
+      assert.equal("mixed", t[0]);
+      assert.equal("coconuts", t[1]);
     });
 
     it('will combine two tuples', function() {
       var t = tuple.concat(Tuple(" chocolate", " bars"));
-      assert.equal("mixed chocolate", t[0])
-      assert.equal("nuts bars", t[1])
+      assert.equal("mixed chocolate", t[0]);
+      assert.equal("nuts bars", t[1]);
     });
 
     it('will apply and concat', function() {
-      var t = Tuple("Re", "dough").map(add).ap(tuple)
-      assert.equal("Remixed", t[0])
-      assert.equal("doughnuts", t[1])
+      var t = Tuple("Re", "dough").map(add).ap(tuple);
+      assert.equal("Remixed", t[0]);
+      assert.equal("doughnuts", t[1]);
     });
-  })
+  });
 
 });
