@@ -1,19 +1,30 @@
 {
-  "author": "Michael Hurley <mh@buzzdecafe.com> (buzzdecafe.com)",
   "name": "ramda-fantasy",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
   "version": "0.2.0",
+  "authors": [{
+    "name": "Michael Hurley", 
+    "email": "mh@buzzdecafe.com",
+    "homepage": "buzzdecafe.com"
+  }, {
+    "name": "Ludwig Magnusson",
+  }],
   "homepage": "https://www.github.com/ramda/ramda-fantasy",
   "license": "MIT",
+  "moduleType": [
+    "node"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/ramda/ramda-fantasy.git"
   },
-  "scripts": {
-    "jshint": "node_modules/.bin/jshint src/* test/*",
-    "pretest": "npm run jshint",
-    "test": "mocha"
-  },
+  "keywords": [
+    "abstract", 
+    "adt", 
+    "datatype", 
+    "functional", 
+    "type"
+  ],
   "dependencies": {
     "ramda": "^0.14.0"
   },
@@ -23,5 +34,8 @@
     "mocha": "^2.1.0",
     "uglify-js": "2.4.x",
     "xyz": "0.5.x"
-  }
+  },
+  "ignore": [
+    "node_modules"    
+  ]
 }
