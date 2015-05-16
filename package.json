@@ -12,6 +12,9 @@
   "scripts": {
     "jshint": "node_modules/.bin/jshint src/* test/*",
     "pretest": "npm run jshint",
+    "release-major": "xyz --repo git@github.com:ramda/ramda-fantasy.git --increment major",
+    "release-minor": "xyz --repo git@github.com:ramda/ramda-fantasy.git --increment minor",
+    "release-patch": "xyz --repo git@github.com:ramda/ramda-fantasy.git --increment patch",
     "test": "mocha"
   },
   "dependencies": {
