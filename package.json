@@ -10,6 +10,7 @@
     "url": "git://github.com/ramda/ramda-fantasy.git"
   },
   "scripts": {
+    "jscs": "node_modules/.bin/jscs src/* test/*",
     "jshint": "node_modules/.bin/jshint src/* test/*",
     "pretest": "npm run jshint",
     "release-major": "xyz --repo git@github.com:ramda/ramda-fantasy.git --increment major",
@@ -21,6 +22,7 @@
     "ramda": "^0.14.0"
   },
   "devDependencies": {
+    "jscs": "1.13.x",
     "jshint": "~2.7.0",
     "jsverify": "^0.5.1",
     "mocha": "^2.1.0",

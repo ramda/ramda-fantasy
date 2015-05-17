@@ -12,10 +12,10 @@ var util = require('./internal/util');
  * @sig a -> Identity[a]
  */
 function Identity(x) {
-    if (!(this instanceof Identity)) {
-        return new Identity(x);
-    }
-    this.value = x;
+  if (!(this instanceof Identity)) {
+    return new Identity(x);
+  }
+  this.value = x;
 }
 
 /**
@@ -25,7 +25,7 @@ function Identity(x) {
  * @sig a -> Identity[a]
  */
 Identity.of = function(x) {
-    return new Identity(x);
+  return new Identity(x);
 };
 Identity.prototype.of = Identity.of;
 
@@ -37,7 +37,7 @@ Identity.prototype.of = Identity.of;
  * @sig @Identity[a] => (a -> b) -> Identity[b]
  */
 Identity.prototype.map = function(f) {
-    return new Identity(f(this.value));
+  return new Identity(f(this.value));
 };
 
 /**
@@ -48,7 +48,7 @@ Identity.prototype.map = function(f) {
  * @sig (Identity[a -> b], f: Applicative[_]) => f[a] -> f[b]
  */
 Identity.prototype.ap = function(app) {
-    return app.map(this.value);
+  return app.map(this.value);
 };
 
 /**
@@ -61,7 +61,7 @@ Identity.prototype.ap = function(app) {
  * @sig (Identity[a], m: Monad[_]) => (a -> m[b]) -> m[b]
  */
 Identity.prototype.chain = function(fn) {
-    return fn(this.value);
+  return fn(this.value);
 };
 
 /**
@@ -71,7 +71,7 @@ Identity.prototype.chain = function(fn) {
  * @sig (Identity[a]) => a
  */
 Identity.prototype.get = function() {
-    return this.value;
+  return this.value;
 };
 
 // equality method to enable testing

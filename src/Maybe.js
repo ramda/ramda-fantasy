@@ -1,11 +1,11 @@
 var util = require('./internal/util.js');
 
 function Maybe(x) {
-    return x == null ? _nothing : Maybe.Just(x);
+  return x == null ? _nothing : Maybe.Just(x);
 }
 
 function _Just(x) {
-    this.value = x;
+  this.value = x;
 }
 util.extend(_Just, Maybe);
 
@@ -15,11 +15,11 @@ util.extend(_Nothing, Maybe);
 var _nothing = new _Nothing();
 
 Maybe.Nothing = function() {
-    return _nothing;
+  return _nothing;
 };
 
 Maybe.Just = function(x) {
-    return new _Just(x);
+  return new _Just(x);
 };
 
 Maybe.of = Maybe.Just;
@@ -27,16 +27,16 @@ Maybe.of = Maybe.Just;
 Maybe.prototype.of = Maybe.Just;
 
 Maybe.isJust = function(x) {
-    return x instanceof _Just;
+  return x instanceof _Just;
 };
 
 Maybe.isNothing = function(x) {
-    return x === _nothing;
+  return x === _nothing;
 };
 
 // functor
 _Just.prototype.map = function(f) {
-    return this.of(f(this.value));
+  return this.of(f(this.value));
 };
 
 _Nothing.prototype.map = util.returnThis;
@@ -45,7 +45,7 @@ _Nothing.prototype.map = util.returnThis;
 // takes a Maybe that wraps a function (`app`) and applies its `map`
 // method to this Maybe's value, which must be a function.
 _Just.prototype.ap = function(m) {
-    return m.map(this.value);
+  return m.map(this.value);
 };
 
 _Nothing.prototype.ap = util.returnThis;
@@ -76,7 +76,7 @@ _Nothing.prototype.datatype = _Nothing;
 _Just.prototype.equals = util.getEquals(_Just);
 
 _Nothing.prototype.equals = function(that) {
-    return that === _nothing;
+  return that === _nothing;
 };
 
 Maybe.prototype.isNothing = function() {
@@ -96,4 +96,3 @@ _Nothing.prototype.getOrElse = function(a) {
 };
 
 module.exports = Maybe;
-
