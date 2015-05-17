@@ -6,7 +6,7 @@ var assert = require('assert');
 describe('lift3', function() {
 
   var combine3 = R.curry(function(a, b, c) {
-    return [ a, b, c ].join(' ');
+    return [a, b, c].join(' ');
   });
 
   var i1 = Identity.of('foo');
