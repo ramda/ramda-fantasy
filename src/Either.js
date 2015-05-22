@@ -47,6 +47,10 @@ _Right.prototype.bimap = function(_, f) {
     return new _Right(f(this.value));
 };
 
+_Right.prototype.extend = function(f) {
+    return new _Right(f(this));
+};
+
 Either.Right = function(value) {
     return new _Right(value);
 };
@@ -62,6 +66,10 @@ _Left.prototype.ap = function(that) { return that; };
 
 _Left.prototype.bimap = function(f) {
     return new _Left(f(this.value));
+};
+
+_Left.prototype.extend = function(_) {
+    return this;
 };
 
 Either.Left = function(value) {
