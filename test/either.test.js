@@ -57,6 +57,17 @@ describe('Either', function() {
         assert.equal(true, mTest.iface(e));
     });
 
+    it('is an Extend', function() {
+        var eTest = types.extend;
+        var r = Either(null, 1);
+        var l = Either(1, null);
+        var f = function(x) {return x + 1;};
+
+        assert.equal(true, eTest.iface(e));
+        assert.equal(true, eTest.iface(r.extend(f)));
+        assert.equal(true, eTest.iface(l.extend(f)));
+    });
+
     describe('#bimap', function() {
 
         it('maps the first function over the left value', function() {

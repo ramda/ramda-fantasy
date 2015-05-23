@@ -68,9 +68,7 @@ _Left.prototype.bimap = function(f) {
     return new _Left(f(this.value));
 };
 
-_Left.prototype.extend = function(_) {
-    return this;
-};
+_Left.prototype.extend = util.returnThis;
 
 Either.Left = function(value) {
     return new _Left(value);
