@@ -5,7 +5,8 @@ var interfaces = {
     apply:          ['map', 'ap'],
     applicative:    ['map', 'ap', 'of'],
     chain:          ['map', 'ap', 'chain'],
-    monad:          ['map', 'ap', 'chain', 'of']
+    monad:          ['map', 'ap', 'chain', 'of'],
+    extend:         ['extend']
 };
 
 function correctInterface(type) {
@@ -79,5 +80,9 @@ module.exports = {
 
     monad: {
         iface: correctInterface('monad')
+    },
+
+    extend: {
+        iface: correctInterface('extend')
     }
 };
