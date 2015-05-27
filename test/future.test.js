@@ -116,7 +116,7 @@ describe('Future', function() {
       });
 
       it('does the apply in parallel', function(done) {
-        this.timeout(20);
+        this.timeout(25);
         var f1 = delayValue(15, 1);
         var f2 = delayValue(15, 2);
         f1.map(add).ap(f2).fork(null, assertCbVal(done, 3));
