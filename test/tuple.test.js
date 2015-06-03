@@ -7,23 +7,23 @@ var Tuple = require('..').Tuple;
 var constructor = Tuple("", "").constructor;
 
 var TupleGen = R.curry(function(a, b, n) {
-    return Tuple(a.generator(n), b.generator(n));
+  return Tuple(a.generator(n), b.generator(n));
 });
 
 var TupleShow = R.curry(function(a, m) {
-    return "Tuple(" + a.show(m[0]) + ", " + a.show(m[1]) + ")";
+  return "Tuple(" + a.show(m[0]) + ", " + a.show(m[1]) + ")";
 });
 
 var TupleShrink = R.curry(function(a, m) {
-    return [Tuple(a.shrink(m[0]), a.shrink(m[1]))];
+  return [Tuple(a.shrink(m[0]), a.shrink(m[1]))];
 });
 
 var TupleArb = function(a, b) {
-    return {
-        generator: jsv.generator.bless(TupleGen(a, b)),
-        show: TupleShow(a),
-        shrink: jsv.shrink.bless(TupleShrink(a))
-    };
+  return {
+    generator: jsv.generator.bless(TupleGen(a, b)),
+    show: TupleShow(a),
+    shrink: jsv.shrink.bless(TupleShrink(a))
+  };
 };
 
 var stringArb = jsv.generator.bless({
@@ -39,63 +39,63 @@ var stringArb = jsv.generator.bless({
 });
 
 function mult(a) {
-    return function(b) { return a * b; };
+  return function(b) { return a * b; };
 }
 
 function add(a) {
-    return function(b) { return a + b; };
+  return function(b) { return a + b; };
 }
 
 
 describe('Tuple', function() {
-    var m = TupleArb(stringArb, jsv.nat);
+  var m = TupleArb(stringArb, jsv.nat);
 
-    it('has an arbitrary', function() {
-        var arb = jsv.forall(m, function(m) {
-            return m instanceof constructor;
-        });
-        jsv.assert(arb);
+  it('has an arbitrary', function() {
+    var arb = jsv.forall(m, function(m) {
+      return m instanceof constructor;
     });
+    jsv.assert(arb);
+  });
 
-    it('is a Semigroup', function() {
-        var t = TupleArb(stringArb, stringArb);
-        var t1 = TupleArb(stringArb, stringArb);
-        var t2 = TupleArb(stringArb, stringArb);
-        var sTest = types.semigroup;
+  it('is a Semigroup', function() {
+    var t = TupleArb(stringArb, stringArb);
+    var t1 = TupleArb(stringArb, stringArb);
+    var t2 = TupleArb(stringArb, stringArb);
+    var sTest = types.semigroup;
 
-        jsv.assert(jsv.forall(t, sTest.iface));
-        jsv.assert(jsv.forall(t, t1, t2, sTest.associative));
-    });
+    jsv.assert(jsv.forall(t, sTest.iface));
+    jsv.assert(jsv.forall(t, t1, t2, sTest.associative));
+  });
 
-    it('is a Functor', function() {
-        var fTest = types.functor;
+  it('is a Functor', function() {
+    var fTest = types.functor;
 
-        jsv.assert(jsv.forall(m, fTest.iface));
-        jsv.assert(jsv.forall(m, fTest.id));
-        jsv.assert(jsv.forall(m, 'nat -> nat', 'nat -> nat', fTest.compose));
-    });
+    jsv.assert(jsv.forall(m, fTest.iface));
+    jsv.assert(jsv.forall(m, fTest.id));
+    jsv.assert(jsv.forall(m, 'nat -> nat', 'nat -> nat', fTest.compose));
+  });
 
-    it('is an Apply', function() {
-        var aTest = types.apply;
-        var appA = Tuple("", mult(10));
-        var appU = Tuple("", add(7));
-        var appV = Tuple("", 10);
+  it('is an Apply', function() {
+    var aTest = types.apply;
+    var appA = Tuple("", mult(10));
+    var appU = Tuple("", add(7));
+    var appV = Tuple("", 10);
 
-        jsv.assert(jsv.forall(m, aTest.iface));
-        assert.equal(true, aTest.compose(appA, appU, appV));
-    });
+    jsv.assert(jsv.forall(m, aTest.iface));
+    assert.equal(true, aTest.compose(appA, appU, appV));
+  });
 
-    it('is an Applicative', function() {
-        var aTest = types.applicative;
-        var app1 = Tuple("", 101);
-        var app2 = Tuple("", -123);
-        var appF = Tuple("", mult(3));
+  it('is an Applicative', function() {
+    var aTest = types.applicative;
+    var app1 = Tuple("", 101);
+    var app2 = Tuple("", -123);
+    var appF = Tuple("", mult(3));
 
-        assert.equal(true, aTest.iface(app1));
-        assert.equal(true, aTest.id(app1, app2));
-        assert.equal(true, aTest.homomorphic(app1, add(3), 46));
-        assert.equal(true, aTest.interchange(app2, appF, 17));
-    });
+    assert.equal(true, aTest.iface(app1));
+    assert.equal(true, aTest.id(app1, app2));
+    assert.equal(true, aTest.homomorphic(app1, add(3), 46));
+    assert.equal(true, aTest.interchange(app2, appF, 17));
+  });
 });
 
 describe('Tuple usage', function() {
