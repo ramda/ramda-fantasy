@@ -73,6 +73,15 @@ describe('Reader properties', function() {
     assert.equal(true, mTest.iface(r1));
   });
 
+  describe('#toString', function() {
+
+    it('returns the string representation of a Reader', function() {
+      assert.strictEqual(Reader(function(x) { void x; }).toString(),
+                         'Reader(function (x) { void x; })');
+    });
+
+  });
+
 });
 
 describe('Reader examples', function() {

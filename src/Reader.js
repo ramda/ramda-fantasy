@@ -48,4 +48,8 @@ Reader.prototype.equals = function(that) {
   R.eqDeep(Reader.run(this), Reader.run(that));
 };
 
+Reader.prototype.toString = function() {
+  return 'Reader(' + R.toString(this.run) + ')';
+};
+
 module.exports = Reader;

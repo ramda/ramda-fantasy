@@ -84,4 +84,18 @@ describe('Either', function() {
 
   });
 
+  describe('#toString', function() {
+
+    it('returns the string representation of a Left', function() {
+      assert.strictEqual(Either.Left('Cannot divide by zero').toString(),
+                         'Either.Left("Cannot divide by zero")');
+    });
+
+    it('returns the string representation of a Right', function() {
+      assert.strictEqual(Either.Right([1, 2, 3]).toString(),
+                         'Either.Right([1, 2, 3])');
+    });
+
+  });
+
 });

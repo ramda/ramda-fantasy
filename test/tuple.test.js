@@ -180,4 +180,15 @@ describe('Tuple usage', function() {
     });
   });
 
+  describe('#toString', function() {
+
+    it('returns the string representation of a Tuple', function() {
+      assert.strictEqual(Tuple('abc', [1, 2, 3]).toString(),
+                         'Tuple("abc", [1, 2, 3])');
+      assert.strictEqual(Tuple('abc', Tuple(1, 2)).toString(),
+                         'Tuple("abc", Tuple(1, 2))');
+    });
+
+  });
+
 });

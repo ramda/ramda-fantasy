@@ -81,4 +81,8 @@ Future.reject = function(val) {
   });
 };
 
+Future.prototype.toString = function() {
+  return 'Future(' + R.toString(this.fork) + ')';
+};
+
 module.exports = Future;

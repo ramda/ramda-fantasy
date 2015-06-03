@@ -1,3 +1,5 @@
+var R = require('ramda');
+
 var util = require('./internal/util');
 
 
@@ -76,5 +78,9 @@ Identity.prototype.get = function() {
 
 // equality method to enable testing
 Identity.prototype.equals = util.getEquals(Identity);
+
+Identity.prototype.toString = function() {
+  return 'Identity(' + R.toString(this.value) + ')';
+};
 
 module.exports = Identity;

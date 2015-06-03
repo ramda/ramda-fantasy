@@ -60,6 +60,18 @@ describe('Identity', function() {
     var mTest = types.monad;
     assert.equal(true, mTest.iface(m));
   });
+
+  describe('#toString', function() {
+
+    it('returns the string representation of an Identity', function() {
+      assert.strictEqual(Identity([1, 2, 3]).toString(),
+                         'Identity([1, 2, 3])');
+      assert.strictEqual(Identity(Identity('abc')).toString(),
+                         'Identity(Identity("abc"))');
+    });
+
+  });
+
 });
 
 describe('Identity example', function() {

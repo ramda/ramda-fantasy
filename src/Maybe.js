@@ -1,3 +1,5 @@
+var R = require('ramda');
+
 var util = require('./internal/util.js');
 
 function Maybe(x) {
@@ -93,6 +95,14 @@ _Just.prototype.getOrElse = function() {
 
 _Nothing.prototype.getOrElse = function(a) {
   return a;
+};
+
+_Just.prototype.toString = function() {
+  return 'Maybe.Just(' + R.toString(this.value) + ')';
+};
+
+_Nothing.prototype.toString = function() {
+  return 'Maybe.Nothing()';
 };
 
 module.exports = Maybe;
