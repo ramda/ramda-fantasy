@@ -11,8 +11,8 @@ var MaybeGen = R.curry(function(a, n) {
 
 var MaybeShow = R.curry(function(a, m) {
   return (Maybe.isJust(m)) ?
-    "Just(" + a.show(m.value) + ")" :
-    "Nothing";
+    'Just(' + a.show(m.value) + ')' :
+    'Nothing';
 });
 
 var MaybeShrink = R.curry(function(a, m) {

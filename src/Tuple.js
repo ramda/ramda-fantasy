@@ -10,7 +10,7 @@ function Tuple(x, y) {
         return new _Tuple(x, y);
       };
     default:
-      return new _Tuple(x,y);
+      return new _Tuple(x, y);
   }
 }
 
@@ -22,9 +22,9 @@ function _Tuple(x, y) {
 
 function ensureConcat(xs) {
   xs.forEach(function(x) {
-    if(typeof x.concat != "function") {
+    if (typeof x.concat != 'function') {
       var display = x.show ? x.show() : x;
-      throw new TypeError(display + " must be a semigroup to perform this operation");
+      throw new TypeError(display + ' must be a semigroup to perform this operation');
     }
   });
 }
@@ -69,7 +69,7 @@ _Tuple.prototype.equals = function(that) {
 
 // show - not recursive yet.
 _Tuple.prototype.show = function() {
-  return "Tuple(" + this[0] + ", " + this[1] + ")";
+  return 'Tuple(' + this[0] + ', ' + this[1] + ')';
 };
 
 module.exports = Tuple;
