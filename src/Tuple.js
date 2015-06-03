@@ -1,4 +1,4 @@
-var eqDeep = require('ramda').eqDeep;
+var R = require('ramda');
 
 
 function Tuple(x, y) {
@@ -23,8 +23,7 @@ function _Tuple(x, y) {
 function ensureConcat(xs) {
   xs.forEach(function(x) {
     if (typeof x.concat != 'function') {
-      var display = x.show ? x.show() : x;
-      throw new TypeError(display + ' must be a semigroup to perform this operation');
+      throw new TypeError(R.toString(x) + ' must be a semigroup to perform this operation');
     }
   });
 }
@@ -64,12 +63,11 @@ _Tuple.prototype.ap = function(m) {
 
 // setoid
 _Tuple.prototype.equals = function(that) {
-  return that instanceof _Tuple && eqDeep(this[0], that[0]) && eqDeep(this[1], that[1]);
+  return that instanceof _Tuple && R.eqDeep(this[0], that[0]) && R.eqDeep(this[1], that[1]);
 };
 
-// show - not recursive yet.
-_Tuple.prototype.show = function() {
-  return 'Tuple(' + this[0] + ', ' + this[1] + ')';
+_Tuple.prototype.toString = function() {
+  return 'Tuple(' + R.toString(this[0]) + ', ' + R.toString(this[1]) + ')';
 };
 
 module.exports = Tuple;

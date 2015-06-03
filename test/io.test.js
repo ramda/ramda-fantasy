@@ -88,4 +88,13 @@ describe('IO', function() {
     assert.equal(true, mTest.iface(i1));
   });
 
+  describe('#toString', function() {
+
+    it('returns the string representation of an IO', function() {
+      assert.strictEqual(IO(function() {}).toString(),
+                         'IO(function () {})');
+    });
+
+  });
+
 });

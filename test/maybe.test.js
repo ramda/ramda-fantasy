@@ -117,4 +117,18 @@ describe('Maybe usage', function() {
 
   });
 
+  describe('#toString', function() {
+
+    it('returns the string representation of a Just', function() {
+      assert.strictEqual(Maybe.Just([1, 2, 3]).toString(),
+                         'Maybe.Just([1, 2, 3])');
+    });
+
+    it('returns the string representation of a Nothing', function() {
+      assert.strictEqual(Maybe.Nothing().toString(),
+                         'Maybe.Nothing()');
+    });
+
+  });
+
 });

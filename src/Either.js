@@ -1,3 +1,5 @@
+var R = require('ramda');
+
 var util = require('./internal/util');
 
 
@@ -51,6 +53,10 @@ _Right.prototype.extend = function(f) {
   return new _Right(f(this));
 };
 
+_Right.prototype.toString = function() {
+  return 'Either.Right(' + R.toString(this.value) + ')';
+};
+
 Either.Right = function(value) {
   return new _Right(value);
 };
@@ -69,6 +75,10 @@ _Left.prototype.bimap = function(f) {
 };
 
 _Left.prototype.extend = util.returnThis;
+
+_Left.prototype.toString = function() {
+  return 'Either.Left(' + R.toString(this.value) + ')';
+};
 
 Either.Left = function(value) {
   return new _Left(value);

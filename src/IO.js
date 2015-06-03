@@ -52,3 +52,7 @@ IO.prototype.equals = function(that) {
     this.fn === that.fn ||
     R.eqDeep(IO.runIO(this), IO.runIO(that));
 };
+
+IO.prototype.toString = function() {
+  return 'IO(' + R.toString(this.fn) + ')';
+};
