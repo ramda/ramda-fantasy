@@ -1,5 +1,16 @@
 {
   "author": "Michael Hurley <mh@buzzdecafe.com> (buzzdecafe.com)",
+  "contributors": [
+    {
+      "name": "Michael Hurley",
+      "email": "mh@buzzdecafe.com",
+      "web": "http://buzzdecafe.com"
+    },
+    {
+      "name": "Ludwig Magnusson",
+      "email": "ludwig@itcatapult.com"
+    },
+  ],
   "name": "ramda-fantasy",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
   "version": "0.2.0",
