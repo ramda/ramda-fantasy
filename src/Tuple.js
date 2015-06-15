@@ -63,7 +63,7 @@ _Tuple.prototype.ap = function(m) {
 
 // setoid
 _Tuple.prototype.equals = function(that) {
-  return that instanceof _Tuple && R.eqDeep(this[0], that[0]) && R.eqDeep(this[1], that[1]);
+  return that instanceof _Tuple && R.equals(this[0], that[0]) && R.equals(this[1], that[1]);
 };
 
 _Tuple.prototype.toString = function() {
