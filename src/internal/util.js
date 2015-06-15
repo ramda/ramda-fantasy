@@ -1,4 +1,4 @@
-var eqDeep = require('ramda').eqDeep;
+var _equals = require('ramda').equals;
 
 
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
 
   getEquals: function(constructor) {
     return function equals(that) {
-      return that instanceof constructor && eqDeep(this.value, that.value);
+      return that instanceof constructor && _equals(this.value, that.value);
     };
   },
 

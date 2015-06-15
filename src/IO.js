@@ -50,7 +50,7 @@ IO.of = IO.prototype.of;
 IO.prototype.equals = function(that) {
   return this === that ||
     this.fn === that.fn ||
-    R.eqDeep(IO.runIO(this), IO.runIO(that));
+    R.equals(IO.runIO(this), IO.runIO(that));
 };
 
 IO.prototype.toString = function() {

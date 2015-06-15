@@ -45,7 +45,7 @@ Reader.ask = Reader(function(a) {
 Reader.prototype.equals = function(that) {
   return this === that ||
   this.run === that.run ||
-  R.eqDeep(Reader.run(this), Reader.run(that));
+  R.equals(Reader.run(this), Reader.run(that));
 };
 
 Reader.prototype.toString = function() {
