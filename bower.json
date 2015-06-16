@@ -3,11 +3,11 @@
   "description": "Fantasy Land compatible types for easy integration with Ramda",
   "version": "0.2.0",
   "authors": [{
-    "name": "Michael Hurley", 
+    "name": "Michael Hurley",
     "email": "mh@buzzdecafe.com",
     "homepage": "buzzdecafe.com"
   }, {
-    "name": "Ludwig Magnusson",
+    "name": "Ludwig Magnusson"
   }],
   "homepage": "https://www.github.com/ramda/ramda-fantasy",
   "license": "MIT",
@@ -19,10 +19,10 @@
     "url": "git://github.com/ramda/ramda-fantasy.git"
   },
   "keywords": [
-    "abstract", 
-    "adt", 
-    "datatype", 
-    "functional", 
+    "abstract",
+    "adt",
+    "datatype",
+    "functional",
     "type"
   ],
   "dependencies": {
@@ -36,6 +36,6 @@
     "xyz": "0.5.x"
   },
   "ignore": [
-    "node_modules"    
+    "node_modules"
   ]
 }
