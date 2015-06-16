@@ -9,7 +9,7 @@
     {
       "name": "Ludwig Magnusson",
       "email": "ludwig@mediatool.com"
-    },
+    }
   ],
   "name": "ramda-fantasy",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
