@@ -13,7 +13,7 @@
   ],
   "name": "ramda-fantasy",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://www.github.com/ramda/ramda-fantasy",
   "license": "MIT",
   "repository": {
