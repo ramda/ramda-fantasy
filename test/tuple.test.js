@@ -84,18 +84,6 @@ describe('Tuple', function() {
     jsv.assert(jsv.forall(m, aTest.iface));
     assert.equal(true, aTest.compose(appA, appU, appV));
   });
-
-  it('is an Applicative', function() {
-    var aTest = types.applicative;
-    var app1 = Tuple('', 101);
-    var app2 = Tuple('', -123);
-    var appF = Tuple('', mult(3));
-
-    assert.equal(true, aTest.iface(app1));
-    assert.equal(true, aTest.id(app1, app2));
-    assert.equal(true, aTest.homomorphic(app1, add(3), 46));
-    assert.equal(true, aTest.interchange(app2, appF, 17));
-  });
 });
 
 describe('Tuple usage', function() {
@@ -105,18 +93,6 @@ describe('Tuple usage', function() {
       var tpl = Tuple('dr')(true);
       assert.equal('dr', tpl[0]);
       assert.equal(true, tpl[1]);
-    });
-
-    it('should lift the value into the tuple as both positions', function() {
-      var tpl = Tuple.of('pillow pets');
-      assert.equal('pillow pets', tpl[0]);
-      assert.equal('pillow pets', tpl[1]);
-    });
-
-    it('should maintain the current fst if it already has one', function() {
-      var tpl = Tuple.of(100).of('buckaroonies');
-      assert.equal(100, tpl[0]);
-      assert.equal('buckaroonies', tpl[1]);
     });
   });
 

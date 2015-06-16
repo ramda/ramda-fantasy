@@ -28,20 +28,12 @@ function ensureConcat(xs) {
   });
 }
 
-Tuple.of = function(x) {
-  return Tuple(x, x);
-};
-
 Tuple.fst = function(x) {
   return x[0];
 };
 
 Tuple.snd = function(x) {
   return x[1];
-};
-
-_Tuple.prototype.of = function(x) {
-  return Tuple(this[0], x);
 };
 
 // semigroup
