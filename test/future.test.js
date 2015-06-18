@@ -86,6 +86,14 @@ describe('Future', function() {
     assert.equal(true, Future.of(2).equals(result));
   });
 
+  describe('chainReject', function() {
+    it('.chainReject should work like chain but off reject case', function() {
+      var f1 = Future.reject(2);
+      var f2 = function(val){ return Future.of(val + 3);};
+      assert.equal(true, Future.of(5).equals(f1.chainReject(f2)));
+    });
+  });
+
   describe('#ap', function() {
     /*jshint browser:true */
     var add = R.add;
