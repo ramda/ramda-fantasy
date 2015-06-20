@@ -53,10 +53,22 @@ Future.prototype.of = Future.of;
 //  f must be a function which returns a value
 //  f must return a value of the same Chain
 //  chain must return a value of the same Chain
+//:: Future a, b => (b -> Future c) -> Future c
 Future.prototype.chain = function(f) {  // Sorella's:
   return new Future(function(reject, resolve) {
     return this.fork(function(a) { return reject(a); },
                      function(b) { return f(b).fork(reject, resolve); });
+  }.bind(this));
+};
+
+// chainReject
+// Like chain but operates on the reject instead of the resolve case.
+//:: Future a, b => (a -> Future c) -> Future c
+Future.prototype.chainReject = function(f) {
+  return new Future(function(reject, resolve) {
+    return this.fork(function(a) { return f(a).fork(reject, resolve); },
+                     function(b) { return resolve(b);
+    });
   }.bind(this));
 };
 
