@@ -26,6 +26,16 @@ Either.prototype.chain = util.returnThis; // throw?
 
 Either.equals = Either.prototype.equals = util.getEquals(Either);
 
+Either.either = R.curry(function either(leftFn, rightFn, e) {
+  if (e instanceof _Left) {
+    return leftFn(e.value);
+  } else if (e instanceof _Right) {
+    return rightFn(e.value);
+  } else {
+    throw new TypeError('invalid type given to Either.either');
+  }
+});
+
 
 // Right
 function _Right(x) {

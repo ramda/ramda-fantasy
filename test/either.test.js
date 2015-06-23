@@ -84,6 +84,24 @@ describe('Either', function() {
 
   });
 
+  describe('.either', function() {
+    var fail = function(x) {
+      assert.fail(x, void 0, 'this should not be called');
+    };
+
+    it('returns the value of a Left after applying the first function arg', function() {
+      assert.strictEqual(Either.either(add(1), fail, Either.Left(42)), 43);
+    });
+
+    it('returns the value of a Right after applying the second function arg', function() {
+      assert.strictEqual(Either.either(fail, add(1), Either.Right(42)), 43);
+    });
+
+    it('is curried', function() {
+      assert.strictEqual(Either.either(add(1))(fail)(Either.Left(42)), 43);
+    });
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of a Left', function() {
