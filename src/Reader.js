@@ -38,9 +38,7 @@ Reader.prototype.of = function(a) {
 };
 Reader.of = Reader.prototype.of;
 
-Reader.ask = Reader(function(a) {
-  return a;
-});
+Reader.ask = Reader(R.always);
 
 Reader.prototype.equals = function(that) {
   return this === that ||
@@ -50,6 +48,60 @@ Reader.prototype.equals = function(that) {
 
 Reader.prototype.toString = function() {
   return 'Reader(' + R.toString(this.run) + ')';
+};
+
+Reader.T = function(M) {
+  var ReaderT = function ReaderT(run) {
+    if (!(this instanceof ReaderT)) {
+      return new ReaderT(run);
+    }
+    this.run = run;
+  };
+
+  ReaderT.lift = R.compose(ReaderT, R.always);
+
+  ReaderT.ask = ReaderT(M.of);
+
+  ReaderT.prototype.of = ReaderT.of = function(a) {
+    return ReaderT(function() {
+      return M.of(a);
+    });
+  };
+
+  ReaderT.prototype.chain = function(f) {
+    var readerT = this;
+    return ReaderT(function(e) {
+      var m = readerT.run(e);
+      return m.chain(function(a) {
+        return f(a).run(e);
+      });
+    });
+  };
+
+  ReaderT.prototype.map = function(f) {
+    return this.chain(function(a) {
+      return ReaderT.of(f(a));
+    });
+  };
+
+  ReaderT.prototype.ap = function(a) {
+    var readerT = this;
+    return ReaderT(function(e) {
+      return readerT.run(e).ap(a.run(e));
+    });
+  };
+
+  ReaderT.prototype.equals = function(that) {
+    return this === that ||
+      this.run === that.run ||
+      R.equals(this.run().get(), that.run().get());
+  };
+
+  ReaderT.prototype.toString = function() {
+    return 'ReaderT[' + M.name + '](' + R.toString(this.run) + ')';
+  };
+
+  return ReaderT;
 };
 
 module.exports = Reader;
