@@ -36,6 +36,12 @@ Maybe.isNothing = function(x) {
   return x === _nothing;
 };
 
+Maybe.maybe = R.curry(function(nothingVal, justFn, m) {
+  return m.reduce(function(_, x) {
+    return justFn(x);
+  }, nothingVal);
+});
+
 // functor
 _Just.prototype.map = function(f) {
   return this.of(f(this.value));
@@ -95,6 +101,14 @@ _Just.prototype.getOrElse = function() {
 
 _Nothing.prototype.getOrElse = function(a) {
   return a;
+};
+
+_Just.prototype.reduce = function(f, x) {
+  return f(x, this.value);
+};
+
+_Nothing.prototype.reduce = function(f, x) {
+  return x;
 };
 
 _Just.prototype.toString = function() {
