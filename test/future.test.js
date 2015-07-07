@@ -201,5 +201,42 @@ describe('Future', function() {
 
   });
 
+  describe('#fork', function() {
+
+    var result;
+    var futureOne = Future.of(1);
+    var throwError = function() {
+      throw new Error('Some error message');
+    };
+    var setErrorResult = function(e) {
+      result = e.message;
+    };
+
+    beforeEach(function() {
+      result = null;
+    });
+
+    it('creates a rejected future if the resolve function throws an error', function() {
+      futureOne.fork(setErrorResult, throwError);
+      assert.equal('Some error message', result);
+    });
+
+    it('rejects the future if an error is thrown in a map function', function() {
+      futureOne.map(throwError).fork(setErrorResult);
+      assert.equal('Some error message', result);
+    });
+
+    it('rejects the future if an error is thrown in a chain function', function() {
+      futureOne.chain(throwError).fork(setErrorResult);
+      assert.equal('Some error message', result);
+    });
+
+    it('rejects the future if an error is thrown in a ap function', function() {
+      Future.of(throwError).ap(futureOne).fork(setErrorResult);
+      assert.equal('Some error message', result);
+    });
+
+  });
+
 });
 

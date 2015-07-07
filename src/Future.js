@@ -5,8 +5,16 @@ function Future(f) {
   if (!(this instanceof Future)) {
     return new Future(f);
   }
-  this.fork = f;
+  this._fork = f;
 }
+
+Future.prototype.fork = function(reject, resolve) {
+  try {
+    this._fork(reject, resolve);
+  } catch(e) {
+    reject(e);
+  }
+};
 
 // functor
 Future.prototype.map = function(f) {
@@ -94,7 +102,7 @@ Future.reject = function(val) {
 };
 
 Future.prototype.toString = function() {
-  return 'Future(' + R.toString(this.fork) + ')';
+  return 'Future(' + R.toString(this._fork) + ')';
 };
 
 module.exports = Future;
