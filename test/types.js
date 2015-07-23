@@ -6,7 +6,8 @@ var interfaces = {
   applicative:    ['map', 'ap', 'of'],
   chain:          ['map', 'ap', 'chain'],
   monad:          ['map', 'ap', 'chain', 'of'],
-  extend:         ['extend']
+  extend:         ['extend'],
+  foldable:       ['reduce']
 };
 
 function correctInterface(type) {
@@ -84,5 +85,9 @@ module.exports = {
 
   extend: {
     iface: correctInterface('extend')
+  },
+
+  foldable: {
+    iface: correctInterface('foldable')
   }
 };

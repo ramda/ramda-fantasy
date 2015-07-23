@@ -8,21 +8,21 @@ ramda-fantasy
 [2]: https://github.com/ramda/ramda
 
 ## Project status
-This project is in alpha status. The implementation of the Fantasy Land spec should be *mostly* 
-stable. Any methods outside of the Fantasy Land spec are subject to change. The types also have 
+This project is in alpha status. The implementation of the Fantasy Land spec should be *mostly*
+stable. Any methods outside of the Fantasy Land spec are subject to change. The types also have
 not undergone thorough testing/use yet.
 
 ## Available types
 
- Name       | Setoid  | Semigroup | Functor | Applicative | Monad | Comonad  |
- ---------- | :-----: | :-------: | :-----: | :---------: | :---: | :------: |
- Either     |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
- Future     |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
- Identity   |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
- IO         |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
- Maybe      |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
- Reader     |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |
- Tuple      |  **✔︎**  |   **✔︎**   |  **✔︎**  |             |       |          |
+ Name       | Setoid  | Semigroup | Functor | Applicative | Monad | Comonad  | Foldable |
+ ---------- | :-----: | :-------: | :-----: | :---------: | :---: | :------: | :-------: |
+ Either     |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |           |
+ Future     |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |           |
+ Identity   |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |           |
+ IO         |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |           |
+ Maybe      |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |   **✔︎**   |
+ Reader     |  **✔︎**  |           |  **✔︎**  |    **✔︎**    | **✔︎** |          |           |
+ Tuple      |  **✔︎**  |   **✔︎**   |  **✔︎**  |             |       |          |           |
 
 
 Access like so:

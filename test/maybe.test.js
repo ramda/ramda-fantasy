@@ -80,6 +80,17 @@ describe('Maybe', function() {
     jsv.assert(jsv.forall(m, mTest.iface));
   });
 
+  it('is Foldable', function() {
+    var fTest = types.foldable;
+
+    jsv.assert(jsv.forall(m, fTest.iface));
+    jsv.assert(jsv.forall('nat -> nat -> nat', 'nat', 'nat', function(f, n1, n2) {
+      return Maybe.Just(n1).reduce(R.uncurryN(2, f), n2) === f(n2)(n1);
+    }));
+    jsv.assert(jsv.forall('nat -> nat -> nat', 'nat', function(f, n) {
+      return Maybe.Nothing().reduce(R.uncurryN(2, f), n) === n;
+    }));
+  });
 });
 
 describe('Maybe usage', function() {
@@ -131,4 +142,18 @@ describe('Maybe usage', function() {
 
   });
 
+  describe('#maybe', function() {
+
+    it('returns the result of applying the value of a Just to the second argument', function() {
+      jsv.assert(jsv.forall('nat -> nat', 'nat', 'nat', function(f, n1, n2) {
+        return R.equals(Maybe.maybe(n2, f, Maybe.Just(n1)), f(n1));
+      }));
+    });
+
+    it('returns the first argument for a Nothing', function() {
+      jsv.assert(jsv.forall('nat -> nat', 'nat', 'nat', function(f, n) {
+        return R.equals(Maybe.maybe(n, f, Maybe.Nothing()), n);
+      }));
+    });
+  });
 });
