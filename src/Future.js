@@ -105,4 +105,42 @@ Future.prototype.toString = function() {
   return 'Future(' + R.toString(this._fork) + ')';
 };
 
+Future.memoize = function(f) {
+  var status = 'IDLE';
+  var listeners = [];
+  var cachedValue;
+
+  var handleCompletion = R.curry(function(newStatus, cb, val) {
+    status = newStatus;
+    cachedValue = val;
+    cb(val);
+    R.forEach(function(listener) {
+      listener[status](cachedValue);
+    }, listeners);
+  });
+
+  function addListeners(reject, resolve) {
+    listeners.push({ REJECTED: reject, RESOLVED: resolve } );
+  }
+
+  function doResolve(reject, resolve) {
+    status = 'PENDING';
+    return f.fork(
+      handleCompletion('REJECTED', reject),
+      handleCompletion('RESOLVED', resolve)
+    );
+  }
+
+  return new Future(function(reject, resolve) {
+
+    switch(status) {
+      case 'IDLE': doResolve(reject, resolve); break;
+      case 'PENDING': addListeners(reject, resolve); break;
+      case 'REJECTED': reject(cachedValue); break;
+      case 'RESOLVED': resolve(cachedValue); break;
+    }
+
+  });
+};
+
 module.exports = Future;
