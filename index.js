@@ -7,5 +7,6 @@ module.exports = {
     lift3: require('./src/lift3'),
     Maybe: require('./src/Maybe'),
     Tuple: require('./src/Tuple'),
-    Reader: require('./src/Reader')
+    Reader: require('./src/Reader'),
+    Fn: require('./src/Fn')
 };
