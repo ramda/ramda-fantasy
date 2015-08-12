@@ -40,12 +40,6 @@ Reader.of = Reader.prototype.of;
 
 Reader.ask = Reader(R.always);
 
-Reader.prototype.equals = function(that) {
-  return this === that ||
-  this.run === that.run ||
-  R.equals(Reader.run(this), Reader.run(that));
-};
-
 Reader.prototype.toString = function() {
   return 'Reader(' + R.toString(this.run) + ')';
 };

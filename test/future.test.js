@@ -1,6 +1,7 @@
 var R = require('ramda');
 var assert = require('assert');
-var types = require('./types');
+var equalsInvoker = require('./utils').equalsInvoker;
+var types = require('./types')(equalsInvoker);
 var Future = require('../src/Future');
 
 Future.prototype.equals = function(b) {

@@ -1,6 +1,14 @@
 var assert = require('assert');
 var types = require('./types');
 
+var readerTypes = types(function(r1, r2) {
+  return r1.run('x') === r2.run('x');
+});
+
+var transformerTypes = types(function(r1, r2) {
+  return r1.run('x').get() === r2.run('x').get();
+});
+
 var Identity = require('..').Identity;
 var Reader = require('../src/Reader');
 
@@ -29,14 +37,14 @@ describe('Reader properties', function() {
   var r2 = Reader(f2);
 
   it('is a Functor', function() {
-    var fTest = types.functor;
+    var fTest = readerTypes.functor;
     assert.ok(fTest.iface(r1));
     assert.ok(fTest.id(r1));
     assert.ok(fTest.compose(r1, f2, f3));
   });
 
   it('is an Apply', function() {
-    var aTest = types.apply;
+    var aTest = readerTypes.apply;
     var a = Reader(function() { return add(1); });
     var b = Reader(function() { return always(2); });
     var c = Reader(always(4));
@@ -46,7 +54,7 @@ describe('Reader properties', function() {
   });
 
   it('is an Applicative', function() {
-    var aTest = types.applicative;
+    var aTest = readerTypes.applicative;
 
     assert.equal(true, aTest.iface(r1));
     assert.equal(true, aTest.id(Reader, r2));
@@ -59,7 +67,7 @@ describe('Reader properties', function() {
   });
 
   it('is a Chain', function() {
-    var cTest = types.chain;
+    var cTest = readerTypes.chain;
     var c = Reader(function() {
       return Reader(function() {
         return Reader(function() {
@@ -72,7 +80,7 @@ describe('Reader properties', function() {
   });
 
   it('is a Monad', function() {
-    var mTest = types.monad;
+    var mTest = readerTypes.monad;
     assert.equal(true, mTest.iface(r1));
   });
 
@@ -109,22 +117,25 @@ describe('Reader examples', function() {
 });
 
 describe('Reader.T', function() {
-  var f1 = function(x) { return Identity(x + '1 '); };
-  var f2 = function(x) { return Identity(x + '2 '); };
-  var f3 = function(x) { return Identity(x + '3 '); };
-
-  var r1 = ReaderTIdentity(f1);
-  var r2 = ReaderTIdentity(f2);
+  var r1 = ReaderTIdentity(function(x) {
+    return Identity(x + '1 ');
+  });
+  var r2 = ReaderTIdentity(function(x) {
+    return Identity(x + '2 ');
+  });
 
   it('is a Functor', function() {
-    var fTest = types.functor;
+    var fTest = transformerTypes.functor;
     assert(fTest.iface(r1));
     assert(fTest.id(r1));
-    assert(fTest.compose(r1, f2, f3));
+    assert(fTest.compose(r1,
+      function(x) { return x + 'a' },
+      function(x) { return x + 'b' }
+    ));
   });
 
   it('is an Apply', function() {
-    var aTest = types.apply;
+    var aTest = transformerTypes.apply;
     var a = ReaderTIdentity(function() { return Identity(add(1)); });
     var b = ReaderTIdentity(function() { return Identity(always(2)); });
     var c = ReaderTIdentity(always(Identity(4)));
@@ -134,7 +145,7 @@ describe('Reader.T', function() {
   });
 
   it('is an Applicative', function() {
-    var aTest = types.applicative;
+    var aTest = transformerTypes.applicative;
 
     assert(aTest.iface(r1));
     assert(aTest.id(ReaderTIdentity, r2));
@@ -147,7 +158,7 @@ describe('Reader.T', function() {
   });
 
   it('is a Chain', function() {
-    var cTest = types.chain;
+    var cTest = transformerTypes.chain;
     var c = ReaderTIdentity(function() {
       return Identity(ReaderTIdentity(function() {
         return Identity(ReaderTIdentity(function() {
@@ -160,12 +171,12 @@ describe('Reader.T', function() {
   });
 
   it('is a Monad', function() {
-    var mTest = types.monad;
+    var mTest = transformerTypes.monad;
     assert(mTest.iface(r1));
   });
 
   it('is a Transformer', function() {
-    var mtTest = types.transformer;
+    var mtTest = transformerTypes.transformer;
     assert(mtTest.iface(Reader.T));
     assert(mtTest.id(Reader.T));
     assert(mtTest.associative(Reader.T));

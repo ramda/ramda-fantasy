@@ -15,7 +15,8 @@ function IO(fn) {
 IO.prototype.chain = function(f) {
   var io = this;
   return new IO(function() {
-    return f(io.fn()).fn();
+    var next = f(io.fn.apply(io, arguments));
+    return next.fn.apply(next, arguments);
   });
 };
 
@@ -45,13 +46,6 @@ IO.prototype.of = function(x) {
 };
 
 IO.of = IO.prototype.of;
-
-// this is really only to accommodate testing ....
-IO.prototype.equals = function(that) {
-  return this === that ||
-    this.fn === that.fn ||
-    R.equals(IO.runIO(this), IO.runIO(that));
-};
 
 IO.prototype.toString = function() {
   return 'IO(' + R.toString(this.fn) + ')';
