@@ -1,7 +1,10 @@
 var assert = require('assert');
 var types = require('./types');
 
-var Reader = require('..').Reader;
+var Identity = require('..').Identity;
+var Reader = require('../src/Reader');
+
+var ReaderTIdentity = Reader.T(Identity);
 
 function add(a) {
   return function(b) { return a + b; };
@@ -101,6 +104,79 @@ describe('Reader examples', function() {
 
     var nameReader = getOptionsName(options);
 
-    assert.equal(nameReader.run(Printer), '/** header */');
+    assert.equal(Reader.run(nameReader, Printer), '/** header */');
+  });
+});
+
+describe('Reader.T', function() {
+  var f1 = function(x) { return Identity(x + '1 '); };
+  var f2 = function(x) { return Identity(x + '2 '); };
+  var f3 = function(x) { return Identity(x + '3 '); };
+
+  var r1 = ReaderTIdentity(f1);
+  var r2 = ReaderTIdentity(f2);
+
+  it('is a Functor', function() {
+    var fTest = types.functor;
+    assert(fTest.iface(r1));
+    assert(fTest.id(r1));
+    assert(fTest.compose(r1, f2, f3));
+  });
+
+  it('is an Apply', function() {
+    var aTest = types.apply;
+    var a = ReaderTIdentity(function() { return Identity(add(1)); });
+    var b = ReaderTIdentity(function() { return Identity(always(2)); });
+    var c = ReaderTIdentity(always(Identity(4)));
+
+    assert(aTest.iface(r1));
+    assert(aTest.compose(a, b, c));
+  });
+
+  it('is an Applicative', function() {
+    var aTest = types.applicative;
+
+    assert(aTest.iface(r1));
+    assert(aTest.id(ReaderTIdentity, r2));
+    assert(aTest.homomorphic(r1, add(3), 46));
+    assert(aTest.interchange(
+      ReaderTIdentity(function() { return Identity(mult(20)); }),
+      ReaderTIdentity(function() { return Identity(mult(0.5)); }),
+      73
+    ));
+  });
+
+  it('is a Chain', function() {
+    var cTest = types.chain;
+    var c = ReaderTIdentity(function() {
+      return Identity(ReaderTIdentity(function() {
+        return Identity(ReaderTIdentity(function() {
+          return Identity(3);
+        }));
+      }));
+    });
+    assert(cTest.iface(r1));
+    assert(cTest.associative(c, identity, identity));
+  });
+
+  it('is a Monad', function() {
+    var mTest = types.monad;
+    assert(mTest.iface(r1));
+  });
+
+  it('is a Transformer', function() {
+    var mtTest = types.transformer;
+    assert(mtTest.iface(Reader.T));
+    assert(mtTest.id(Reader.T));
+    assert(mtTest.associative(Reader.T));
+  });
+});
+
+describe('Reader.T examples', function() {
+  it('should provide its environment to a lifted monad', function() {
+    var readerTimes10 = ReaderTIdentity.ask.chain(function(env) {
+      return ReaderTIdentity.lift(Identity(env * 10));
+    });
+    assert.strictEqual(readerTimes10.run(3).get(), 30);
   });
 });

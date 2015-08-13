@@ -7,8 +7,11 @@ var interfaces = {
   chain:          ['map', 'ap', 'chain'],
   monad:          ['map', 'ap', 'chain', 'of'],
   extend:         ['extend'],
-  foldable:       ['reduce']
+  foldable:       ['reduce'],
+  transformer:    ['lift']
 };
+
+var Identity = require('..').Identity;
 
 function correctInterface(type) {
   return function(obj) {
@@ -89,5 +92,24 @@ module.exports = {
 
   foldable: {
     iface: correctInterface('foldable')
+  },
+
+  transformer: {
+    iface: function(T) {
+      return correctInterface('transformer')(T(Identity)) &&
+        correctInterface('monad')(T(Identity)(identity));
+    },
+    id: function(transformer) {
+      var T = transformer(Identity);
+      return T.lift(Identity.of(1)).equals(T.of(1));
+    },
+    associative: function(transformer) {
+      var T = transformer(Identity);
+      var m = Identity(1);
+      var f = function (x) { return Identity(x * x); };
+      return T.lift(m.chain(f)).equals(
+        T.lift(m).chain(function(x) { return T.lift(f(x)); })
+      );
+    }
   }
 };
