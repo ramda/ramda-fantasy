@@ -1,5 +1,7 @@
 var assert = require('assert');
-var types = require('./types');
+var types = require('./types')(function(io1, io2) {
+  return io1.runIO('x') === io2.runIO('x');
+});
 
 var IO = require('..').IO;
 

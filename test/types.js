@@ -23,93 +23,110 @@ function correctInterface(type) {
 
 function identity(x) { return x; }
 
-module.exports = {
-  semigroup: {
-    iface: correctInterface('semigroup'),
-    associative: function(a, b, c) {
-      return a.concat(b).concat(c).equals(a.concat(b.concat(c)));
-    }
-  },
-
-  functor: {
-    iface: correctInterface('functor'),
-    id: function(obj) {
-      return obj.equals(obj.map(identity));
+module.exports = function(eq) {
+  return {
+    semigroup: {
+      iface: correctInterface('semigroup'),
+      associative: function (a, b, c) {
+        return eq(a.concat(b).concat(c), a.concat(b.concat(c)));
+      }
     },
-    compose: function(obj, f, g) {
-      return obj.map(function(x) { return f(g(x)); }).equals(
-        obj.map(g).map(f)
-      );
-    }
-  },
 
-  apply: {
-    iface: correctInterface('apply'),
-    compose: function(a, u, v) {
-      return a.ap(u.ap(v)).equals(
-        a.map(function(f) {
-          return function(g) {
-            return function(x) {
-              return f(g(x));
+    functor: {
+      iface: correctInterface('functor'),
+      id: function (obj) {
+        return eq(obj, obj.map(identity));
+      },
+      compose: function (obj, f, g) {
+        return eq(
+          obj.map(function (x) {
+            return f(g(x));
+          }),
+          obj.map(g).map(f)
+        );
+      }
+    },
+
+    apply: {
+      iface: correctInterface('apply'),
+      compose: function (a, u, v) {
+        return eq(
+          a.ap(u.ap(v)),
+          a.map(function (f) {
+            return function (g) {
+              return function (x) {
+                return f(g(x));
+              };
             };
-          };
-        }).ap(u).ap(v)
-      );
-    }
-  },
-
-  applicative: {
-    iface: correctInterface('applicative'),
-    id: function(obj, obj2) {
-      return obj.of(identity).ap(obj2).equals(obj2);
+          }).ap(u).ap(v)
+        );
+      }
     },
-    homomorphic: function(obj, f, x) {
-      return obj.of(f).ap(obj.of(x)).equals(obj.of(f(x)));
+
+    applicative: {
+      iface: correctInterface('applicative'),
+      id: function (obj, obj2) {
+        return eq(obj.of(identity).ap(obj2), obj2);
+      },
+      homomorphic: function (obj, f, x) {
+        return eq(obj.of(f).ap(obj.of(x)), obj.of(f(x)));
+      },
+      interchange: function (obj1, obj2, x) {
+        return eq(
+          obj2.ap(obj1.of(x)),
+          obj1.of(function (f) {
+            return f(x);
+          }).ap(obj2)
+        );
+      }
     },
-    interchange: function(obj1, obj2, x) {
-      return obj2.ap(obj1.of(x)).equals(
-        obj1.of(function(f) { return f(x); }).ap(obj2)
-      );
-    }
-  },
 
-  chain: {
-    iface: correctInterface('chain'),
-    associative: function(obj, f, g) {
-      return obj.chain(f).chain(g).equals(
-        obj.chain(function(x) { return f(x).chain(g); })
-      );
-    }
-  },
-
-  monad: {
-    iface: correctInterface('monad')
-  },
-
-  extend: {
-    iface: correctInterface('extend')
-  },
-
-  foldable: {
-    iface: correctInterface('foldable')
-  },
-
-  transformer: {
-    iface: function(T) {
-      return correctInterface('transformer')(T(Identity)) &&
-        correctInterface('monad')(T(Identity)(identity));
+    chain: {
+      iface: correctInterface('chain'),
+      associative: function (obj, f, g) {
+        return eq(
+          obj.chain(f).chain(g),
+          obj.chain(function (x) {
+            return f(x).chain(g);
+          })
+        );
+      }
     },
-    id: function(transformer) {
-      var T = transformer(Identity);
-      return T.lift(Identity.of(1)).equals(T.of(1));
+
+    monad: {
+      iface: correctInterface('monad')
     },
-    associative: function(transformer) {
-      var T = transformer(Identity);
-      var m = Identity(1);
-      var f = function (x) { return Identity(x * x); };
-      return T.lift(m.chain(f)).equals(
-        T.lift(m).chain(function(x) { return T.lift(f(x)); })
-      );
+
+    extend: {
+      iface: correctInterface('extend')
+    },
+
+    foldable: {
+      iface: correctInterface('foldable')
+    },
+
+    transformer: {
+      iface: function (T) {
+        return correctInterface('transformer')(T(Identity)) &&
+          correctInterface('monad')(T(Identity)(identity));
+      },
+      id: function (transformer) {
+        var T = transformer(Identity);
+        return eq(T.lift(Identity.of(1)), T.of(1));
+      },
+      associative: function (transformer) {
+        var T = transformer(Identity);
+        var m = Identity(1);
+        var f = function (x) {
+          return Identity(x * x);
+        };
+        return eq(
+          T.lift(m.chain(f)),
+          T.lift(m).chain(function (x) {
+            return T.lift(f(x));
+          })
+        );
+      }
     }
   }
 };
