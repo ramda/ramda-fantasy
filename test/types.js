@@ -128,5 +128,5 @@ module.exports = function(eq) {
         );
       }
     }
-  }
+  };
 };
