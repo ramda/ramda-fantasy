@@ -129,8 +129,8 @@ describe('Reader.T', function() {
     assert(fTest.iface(r1));
     assert(fTest.id(r1));
     assert(fTest.compose(r1,
-      function(x) { return x + 'a' },
-      function(x) { return x + 'b' }
+      function(x) { return x + 'a'; },
+      function(x) { return x + 'b'; }
     ));
   });
 
