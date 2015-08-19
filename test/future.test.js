@@ -239,8 +239,8 @@ describe('Future', function() {
 
   });
 
-  describe('#memoize', function() {
-    var memoized;
+  describe('#cache', function() {
+    var cached;
     var throwIfCalledTwice;
 
     beforeEach(function() {
@@ -258,19 +258,19 @@ describe('Future', function() {
     describe('resolve cases', function() {
 
       beforeEach(function() {
-        memoized = Future.memoize(Future.of(1).map(throwIfCalledTwice));
+        cached = Future.cache(Future.of(1).map(throwIfCalledTwice));
       });
 
       it('can be forked with a resolved value', function(done) {
-        memoized.fork(done, function(v) {
+        cached.fork(done, function(v) {
           assert.equal(1, v);
           done();
         });
       });
 
-      it('passes on the same value to the memoized future', function(done) {
-        memoized.fork(done, function() {
-          memoized.fork(done, function(v) {
+      it('passes on the same value to the cached future', function(done) {
+        cached.fork(done, function() {
+          cached.fork(done, function(v) {
             assert.equal(1, v);
             done();
           });
@@ -286,12 +286,12 @@ describe('Future', function() {
       };
 
       beforeEach(function() {
-        memoized = Future.memoize(Future.of(1).map(throwIfCalledTwice).map(throwError));
+        cached = Future.cache(Future.of(1).map(throwIfCalledTwice).map(throwError));
       });
 
       it('can be forked with a rejected value', function() {
         var result;
-        memoized.fork(function(err) {
+        cached.fork(function(err) {
           result = err.message;
         });
         assert.equal('SomeError', result);
@@ -299,8 +299,8 @@ describe('Future', function() {
 
       it('does not call the underlying fork twice', function() {
         var result;
-        memoized.fork(function() {
-          memoized.fork(function(err) {
+        cached.fork(function() {
+          cached.fork(function(err) {
             result = err.message;
           });
         });
@@ -311,11 +311,11 @@ describe('Future', function() {
 
     describe('pending cases', function() {
 
-      it('calls all fork resolve functions when the memoized future is resolved', function(done) {
+      it('calls all fork resolve functions when the cached future is resolved', function(done) {
         var delayed = new Future(function(reject, resolve) {
           setTimeout(resolve, 5, 'resolvedValue');
         });
-        var memoized = Future.memoize(delayed.map(throwIfCalledTwice));
+        var cached = Future.cache(delayed.map(throwIfCalledTwice));
         var result1;
         var result2;
         function assertBoth() {
@@ -325,21 +325,21 @@ describe('Future', function() {
             done();
           }
         }
-        memoized.fork(done, function(v) {
+        cached.fork(done, function(v) {
           result1 = v;
           assertBoth();
         });
-        memoized.fork(done, function(v) {
+        cached.fork(done, function(v) {
           result2 = v;
           assertBoth();
         });
       });
 
-      it('calls all fork reject fnctions when the memoized future is rejected', function(done) {
+      it('calls all fork reject fnctions when the cached future is rejected', function(done) {
         var delayed = new Future(function(reject) {
           setTimeout(reject, 5, 'rejectedValue');
         });
-        var memoized = Future.memoize(delayed.bimap(throwIfCalledTwice, R.identity));
+        var cached = Future.cache(delayed.bimap(throwIfCalledTwice, R.identity));
         var result1;
         var result2;
         function assertBoth() {
@@ -349,11 +349,11 @@ describe('Future', function() {
             done();
           }
         }
-        memoized.fork(function(e) {
+        cached.fork(function(e) {
           result1 = e;
           assertBoth();
         });
-        memoized.fork(function(e) {
+        cached.fork(function(e) {
           result2 = e;
           assertBoth();
         });
