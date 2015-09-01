@@ -105,7 +105,7 @@ Future.prototype.toString = function() {
   return 'Future(' + R.toString(this._fork) + ')';
 };
 
-Future.memoize = function(f) {
+Future.cache = function(f) {
   var status = 'IDLE';
   var listeners = [];
   var cachedValue;
