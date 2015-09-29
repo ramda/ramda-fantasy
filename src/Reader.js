@@ -38,7 +38,7 @@ Reader.prototype.of = function(a) {
 };
 Reader.of = Reader.prototype.of;
 
-Reader.ask = Reader(R.always);
+Reader.ask = Reader(R.identity);
 
 Reader.prototype.toString = function() {
   return 'Reader(' + R.toString(this.run) + ')';

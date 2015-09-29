@@ -84,6 +84,13 @@ describe('Reader properties', function() {
     assert.equal(true, mTest.iface(r1));
   });
 
+  describe('.ask', function() {
+    it('provides access to the environment', function() {
+      var r = Reader.ask.map(add(100));
+      assert.equal(101, r.run(1));
+    });
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of a Reader', function() {
