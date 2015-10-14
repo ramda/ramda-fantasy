@@ -1,105 +1,91 @@
+var R = require('ramda');
 var assert = require('assert');
-var equalsInvoker = require('./utils').equalsInvoker;
-var types = require('./types')(equalsInvoker);
+var jsv = require('jsverify');
+var types = require('./types')(R.equals);
 
 var Either = require('..').Either;
 
+var leftArb = function(arb) {
+  return arb.smap(Either.Left, R.prop('value'), R.toString);
+};
+var rightArb = function(arb) {
+  return arb.smap(Either.Right, R.prop('value'), R.toString);
+};
+var eitherArb = function(arb) {
+  return jsv.oneof([leftArb(arb), rightArb(arb)]);
+};
+
+var eNatArb = eitherArb(jsv.nat);
+var eFnArb = eitherArb(jsv.fn(jsv.nat));
+var fnNatArb = jsv.fn(jsv.nat);
+
 describe('Either', function() {
-  var e = Either('original left', 1);
-
-  function mult(a) {
-    return function(b) { return a * b; };
-  }
-
-  function add(a) {
-    return function(b) { return a + b; };
-  }
 
   it('is a Functor', function() {
     var fTest = types.functor;
-    assert.equal(true, fTest.iface(e));
-    assert.equal(true, fTest.id(e));
-    assert.equal(true, fTest.compose(e, mult(2), add(3)));
+    jsv.assert(jsv.forall(eNatArb, fTest.iface));
+    jsv.assert(jsv.forall(eNatArb, fTest.id));
+    jsv.assert(jsv.forall(eNatArb, fnNatArb, fnNatArb, fTest.compose));
   });
 
   it('is an Apply', function() {
     var aTest = types.apply;
-    var appA = Either('apply test fn a', mult(10));
-    var appU = Either('apply test fn u', add(5));
-    var appV = Either('apply test value v', 10);
-
-    assert.equal(true, aTest.iface(appA));
-    assert.equal(true, aTest.compose(appA, appU, appV));
+    jsv.assert(jsv.forall(eFnArb, eFnArb, eNatArb, aTest.compose));
+    jsv.assert(jsv.forall(eNatArb, aTest.iface));
   });
 
   it('is an Applicative', function() {
     var aTest = types.applicative;
-    var app1 = Either('app1', 101);
-    var app2 = Either('app2', -123);
-    var appF = Either('appF', mult(3));
-
-    assert.equal(true, aTest.iface(app1));
-    assert.equal(true, aTest.id(app1, app2));
-    assert.equal(true, aTest.homomorphic(app1, add(3), 46));
-    assert.equal(true, aTest.interchange(app1, appF, 17));
+    jsv.assert(jsv.forall(eNatArb, aTest.iface));
+    jsv.assert(jsv.forall(eNatArb, eNatArb, aTest.id));
+    jsv.assert(jsv.forall(eNatArb, fnNatArb, jsv.nat, aTest.homomorphic));
+    jsv.assert(jsv.forall(eNatArb, eFnArb, jsv.nat, aTest.interchange));
   });
 
   it('is a Chain', function() {
     var cTest = types.chain;
-    var f1 = function(x) {return Either('f1', (3 * x));};
-    var f2 = function(x) {return Either('f2', (5 + x));};
-
-    assert.equal(true, cTest.iface(e));
-    assert.equal(true, cTest.associative(e, f1, f2));
+    var fnEArb = jsv.fn(eNatArb);
+    jsv.assert(jsv.forall(eNatArb, cTest.iface));
+    jsv.assert(jsv.forall(eNatArb, fnEArb, fnEArb, cTest.associative));
   });
 
   it('is a Monad', function() {
-    var mTest = types.monad;
-    assert.equal(true, mTest.iface(e));
+    jsv.assert(jsv.forall(eNatArb, types.monad.iface));
   });
 
   it('is an Extend', function() {
     var eTest = types.extend;
-    var r = Either(null, 1);
-    var l = Either(1, null);
-    var f = function(x) {return x + 1;};
-
-    assert.equal(true, eTest.iface(e));
-    assert.equal(true, eTest.iface(r.extend(f)));
-    assert.equal(true, eTest.iface(l.extend(f)));
+    jsv.assert(jsv.forall(eNatArb, eTest.iface));
+    jsv.assert(jsv.forall(eNatArb, fnNatArb, fnNatArb, eTest.associative));
   });
 
   describe('#bimap', function() {
 
     it('maps the first function over the left value', function() {
-      var e = Either(1, null);
-      var result = e.bimap(add(1));
-      assert.equal(true, result.equals(Either(2, null)));
+      jsv.assert(jsv.forall(leftArb(jsv.nat), fnNatArb, fnNatArb, function(e, f, g) {
+        return e.bimap(f, g).value === f(e.value);
+      }));
     });
 
     it('maps the second function over the right value', function() {
-      var e = Either(null, 1);
-      var result = e.bimap(null, add(1));
-      assert.equal(true, result.equals(Either(null, 2)));
+      jsv.assert(jsv.forall(rightArb(jsv.nat), fnNatArb, fnNatArb, function(e, f, g) {
+        return e.bimap(f, g).value === g(e.value);
+      }));
     });
 
   });
 
   describe('.either', function() {
-    var fail = function(x) {
-      assert.fail(x, void 0, 'this should not be called');
-    };
-
     it('returns the value of a Left after applying the first function arg', function() {
-      assert.strictEqual(Either.either(add(1), fail, Either.Left(42)), 43);
+      jsv.assert(jsv.forall(leftArb(jsv.nat), fnNatArb, fnNatArb, function(e, f, g) {
+        return Either.either(f, g, e) === f(e.value);
+      }));
     });
 
     it('returns the value of a Right after applying the second function arg', function() {
-      assert.strictEqual(Either.either(fail, add(1), Either.Right(42)), 43);
-    });
-
-    it('is curried', function() {
-      assert.strictEqual(Either.either(add(1))(fail)(Either.Left(42)), 43);
+      jsv.assert(jsv.forall(rightArb(jsv.nat), fnNatArb, fnNatArb, function(e, f, g) {
+        return Either.either(f, g, e) === g(e.value);
+      }));
     });
   });
 
