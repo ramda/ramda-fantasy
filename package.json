@@ -30,7 +30,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "ramda": ">=0.15.0 <0.18.0"
+    "ramda": ">=0.15.0 <=0.18.0"
   },
   "devDependencies": {
     "jscs": "1.13.x",
