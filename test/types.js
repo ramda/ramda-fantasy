@@ -7,6 +7,7 @@ var interfaces = {
   chain:          ['map', 'ap', 'chain'],
   monad:          ['map', 'ap', 'chain', 'of'],
   extend:         ['extend'],
+  comonad:        ['extend', 'extract'],
   foldable:       ['reduce'],
   transformer:    ['lift']
 };
@@ -98,7 +99,25 @@ module.exports = function(eq) {
     },
 
     extend: {
-      iface: correctInterface('extend')
+      iface: correctInterface('extend'),
+      associative: function(obj, f, g) {
+        return eq(
+          obj.extend(g).extend(f),
+          obj.extend(function(_obj) {
+            return f(_obj.extend(g));
+          })
+        );
+      }
+    },
+
+    comonad: {
+      iface: correctInterface('comonad'),
+      leftIdentity: function (obj) {
+        return eq(obj.extend(function(_obj) { return _obj.extract(); }), obj);
+      },
+      rightIdentity: function (obj, f) {
+        return eq(obj.extend(f).extract(), f(obj));
+      }
     },
 
     foldable: {
