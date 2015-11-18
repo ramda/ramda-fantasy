@@ -36,6 +36,8 @@ Tuple.snd = function(x) {
   return x[1];
 };
 
+_Tuple.prototype['@@type'] = 'ramda-fantasy/Tuple';
+
 // semigroup
 _Tuple.prototype.concat = function(x) {
   ensureConcat([this[0], this[1]]);

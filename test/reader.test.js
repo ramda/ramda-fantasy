@@ -91,6 +91,15 @@ describe('Reader properties', function() {
     });
   });
 
+  describe('#@@type', function() {
+
+    it('is "ramda-fantasy/Reader"', function() {
+      assert.strictEqual(Reader(function(x) { void x; })['@@type'],
+                         'ramda-fantasy/Reader');
+    });
+
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of a Reader', function() {

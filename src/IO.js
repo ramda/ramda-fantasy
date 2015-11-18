@@ -11,6 +11,8 @@ function IO(fn) {
   this.fn = fn;
 }
 
+IO.prototype['@@type'] = 'ramda-fantasy/IO';
+
 // `f` must return an IO
 IO.prototype.chain = function(f) {
   var io = this;

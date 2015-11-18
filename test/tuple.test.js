@@ -157,6 +157,14 @@ describe('Tuple usage', function() {
     });
   });
 
+  describe('#@@type', function() {
+
+    it('is "ramda-fantasy/Tuple"', function() {
+      assert.strictEqual(Tuple(null, null)['@@type'], 'ramda-fantasy/Tuple');
+    });
+
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of a Tuple', function() {

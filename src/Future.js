@@ -18,6 +18,8 @@ function Future(f) {
   this._fork = f;
 }
 
+Future.prototype['@@type'] = 'ramda-fantasy/Future';
+
 Future.prototype.fork = function(reject, resolve) {
   this._fork(reject, jail(reject, resolve));
 };

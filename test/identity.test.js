@@ -62,6 +62,14 @@ describe('Identity', function() {
     assert.equal(true, mTest.iface(m));
   });
 
+  describe('#@@type', function() {
+
+    it('is "ramda-fantasy/Identity"', function() {
+      assert.strictEqual(Identity(null)['@@type'], 'ramda-fantasy/Identity');
+    });
+
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of an Identity', function() {

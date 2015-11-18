@@ -20,6 +20,8 @@ function Identity(x) {
   this.value = x;
 }
 
+Identity.prototype['@@type'] = 'ramda-fantasy/Identity';
+
 /**
  * Applicative specification. Creates a new `Identity[a]` holding the value `a`.
  * @param {*} a Value of any type
