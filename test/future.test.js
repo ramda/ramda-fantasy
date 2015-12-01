@@ -212,6 +212,11 @@ describe('Future', function() {
     var setErrorResult = function(e) {
       result = e.message;
     };
+    var delayValue = function(delay, value) {
+      return new Future(function(reject, resolve) {
+        setTimeout(resolve, delay, value);
+      });
+    };
 
     beforeEach(function() {
       result = null;
@@ -235,6 +240,21 @@ describe('Future', function() {
     it('rejects the future if an error is thrown in a ap function', function() {
       Future.of(throwError).ap(futureOne).fork(setErrorResult);
       assert.equal('Some error message', result);
+    });
+
+    it('eventually rejects the future if an error is thrown in a chain function', function(done){
+      var throwEscapeError = function(){
+        throw new Error('This error should be caught');
+      };
+      delayValue(15, 1).chain(throwEscapeError).fork(
+        function(err){
+          assert.equal('This error should be caught', err.message);
+          done();
+        },
+        function(){
+          done(new Error('The future resolved'));
+        }
+      );
     });
 
   });
