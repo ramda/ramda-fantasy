@@ -1,5 +1,15 @@
 var R = require('ramda');
 
+function jail(handler, f){
+  return function(a){
+    try{
+      return f(a);
+    } catch(err) {
+      handler(err);
+    }
+  };
+}
+
 // `f` is a function that takes two function arguments: `reject` (failure) and `resolve` (success)
 function Future(f) {
   if (!(this instanceof Future)) {
@@ -9,11 +19,7 @@ function Future(f) {
 }
 
 Future.prototype.fork = function(reject, resolve) {
-  try {
-    this._fork(reject, resolve);
-  } catch(e) {
-    reject(e);
-  }
+  this._fork(reject, jail(reject, resolve));
 };
 
 // functor
@@ -29,11 +35,11 @@ Future.prototype.ap = function(m) {
     var applyFn, val;
     var doReject = R.once(rej);
 
-    function resolveIfDone() {
+    var resolveIfDone = jail(doReject, function() {
       if (applyFn != null && val != null) {
         return res(applyFn(val));
       }
-    }
+    });
 
     self.fork(doReject, function(fn) {
       applyFn = fn;
@@ -64,8 +70,10 @@ Future.prototype.of = Future.of;
 //:: Future a, b => (b -> Future c) -> Future c
 Future.prototype.chain = function(f) {  // Sorella's:
   return new Future(function(reject, resolve) {
-    return this.fork(function(a) { return reject(a); },
-                     function(b) { return f(b).fork(reject, resolve); });
+    return this.fork(
+      function(a) { return reject(a); },
+      jail(reject, function(b) { return f(b).fork(reject, resolve); })
+    );
   }.bind(this));
 };
 
@@ -74,9 +82,10 @@ Future.prototype.chain = function(f) {  // Sorella's:
 //:: Future a, b => (a -> Future c) -> Future c
 Future.prototype.chainReject = function(f) {
   return new Future(function(reject, resolve) {
-    return this.fork(function(a) { return f(a).fork(reject, resolve); },
-                     function(b) { return resolve(b);
-    });
+    return this.fork(
+      jail(reject, function(a) { return f(a).fork(reject, resolve); }),
+      function(b) { return resolve(b); }
+    );
   }.bind(this));
 };
 
@@ -87,11 +96,10 @@ Future.prototype.chainReject = function(f) {
 Future.prototype.bimap = function(errFn, successFn) {
   var self = this;
   return new Future(function(reject, resolve) {
-    self.fork(function(err) {
-      reject(errFn(err));
-    }, function(val) {
-      resolve(successFn(val));
-    });
+    self.fork(
+      jail(reject, function(err) { reject(errFn(err)); }),
+      jail(reject, function(val) { resolve(successFn(val)); })
+    );
   });
 };
 
