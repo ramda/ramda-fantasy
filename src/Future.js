@@ -41,12 +41,12 @@ Future.prototype.ap = function(m) {
       }
     });
 
-    self.fork(doReject, function(fn) {
+    self._fork(doReject, function(fn) {
       applyFn = fn;
       resolveIfDone();
     });
 
-    m.fork(doReject, function(v) {
+    m._fork(doReject, function(v) {
       val = v;
       resolveIfDone();
     });
@@ -70,9 +70,9 @@ Future.prototype.of = Future.of;
 //:: Future a, b => (b -> Future c) -> Future c
 Future.prototype.chain = function(f) {  // Sorella's:
   return new Future(function(reject, resolve) {
-    return this.fork(
+    return this._fork(
       function(a) { return reject(a); },
-      jail(reject, function(b) { return f(b).fork(reject, resolve); })
+      jail(reject, function(b) { return f(b)._fork(reject, resolve); })
     );
   }.bind(this));
 };
@@ -82,8 +82,8 @@ Future.prototype.chain = function(f) {  // Sorella's:
 //:: Future a, b => (a -> Future c) -> Future c
 Future.prototype.chainReject = function(f) {
   return new Future(function(reject, resolve) {
-    return this.fork(
-      jail(reject, function(a) { return f(a).fork(reject, resolve); }),
+    return this._fork(
+      jail(reject, function(a) { return f(a)._fork(reject, resolve); }),
       function(b) { return resolve(b); }
     );
   }.bind(this));
@@ -96,7 +96,7 @@ Future.prototype.chainReject = function(f) {
 Future.prototype.bimap = function(errFn, successFn) {
   var self = this;
   return new Future(function(reject, resolve) {
-    self.fork(
+    self._fork(
       jail(reject, function(err) { reject(errFn(err)); }),
       jail(reject, function(val) { resolve(successFn(val)); })
     );
@@ -133,7 +133,7 @@ Future.cache = function(f) {
 
   function doResolve(reject, resolve) {
     status = 'PENDING';
-    return f.fork(
+    return f._fork(
       handleCompletion('REJECTED', reject),
       handleCompletion('RESOLVED', resolve)
     );
