@@ -36,6 +36,24 @@ module.exports = {
     };
   },
 
-  returnThis: function() { return this; }
+  returnThis: function() { return this; },
+
+  deriveAp: function (Type) {
+    return function(fa) {
+      return this.chain(function (f) {
+        return fa.chain(function (a) {
+          return Type.of(f(a));
+        });
+      });
+    };
+  },
+
+  deriveMap: function (Type) {
+    return function (f) {
+      return this.chain(function (a) {
+        return Type.of(f(a));
+      });
+    };
+  }
 
 };
