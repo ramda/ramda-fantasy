@@ -118,6 +118,8 @@ describe('Future', function() {
       };
     }
 
+    function noop() {}
+
     it('applies its function to the passed in future', function() {
       var f1 = Future.of(add(1));
       var result = f1.ap(Future.of(2));
@@ -128,19 +130,19 @@ describe('Future', function() {
       this.timeout(25);
       var f1 = delayValue(15, 1);
       var f2 = delayValue(15, 2);
-      f1.map(add).ap(f2).fork(null, assertCbVal(done, 3));
+      f1.map(add).ap(f2).fork(noop, assertCbVal(done, 3));
     });
 
     it('can handle itself being resolved first', function(done) {
       var f1 = delayValue(1, 1);
       var f2 = delayValue(15, 2);
-      f1.map(add).ap(f2).fork(null, assertCbVal(done, 3));
+      f1.map(add).ap(f2).fork(noop, assertCbVal(done, 3));
     });
 
     it('can handle the input future being resolved first', function(done) {
       var f1 = delayValue(15, 1);
       var f2 = delayValue(1, 2);
-      f1.map(add).ap(f2).fork(null, assertCbVal(done, 3));
+      f1.map(add).ap(f2).fork(noop, assertCbVal(done, 3));
     });
 
     it('is rejected with the first error to occur - case 1', function(done) {
