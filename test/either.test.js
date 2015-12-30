@@ -59,6 +59,27 @@ describe('Either', function() {
     jsv.assert(jsv.forall(eNatArb, fnNatArb, fnNatArb, eTest.associative));
   });
 
+  describe('checking for Left | Right', function() {
+    it('should allow the user to check if the instance is a Left', function() {
+      jsv.assert(jsv.forall(leftArb(jsv.nat), rightArb(jsv.nat), function(l, r) {
+        return l.isLeft === true && r.isLeft === false;
+      }));
+    });
+
+    it('should allow the user to check if the instance is a Right', function() {
+      jsv.assert(jsv.forall(leftArb(jsv.nat), rightArb(jsv.nat), function(l, r) {
+        return l.isRight === false && r.isRight === true;
+      }));
+    });
+
+    it('can check the type statically', function() {
+      jsv.assert(jsv.forall(leftArb(jsv.nat), rightArb(jsv.nat), function(l, r) {
+        return Either.isRight(l) === false && Either.isRight(r) === true &&
+               Either.isLeft(l) === true && Either.isLeft(r) === false;
+      }));
+    });
+  });
+
   describe('#bimap', function() {
 
     it('maps the first function over the left value', function() {

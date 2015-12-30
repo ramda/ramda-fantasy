@@ -74,6 +74,18 @@ the types of values contained in both `Left` and `Right`.
 Creates a pure instance of an `Either`. This is effectively a `Right`
 constructor.
 
+#### `Either.isLeft`
+```hs
+:: Either a b -> Boolean
+```
+Returns `true` if the given `Either` instance is a `Left`, otherwise `false`.
+
+#### `Either.isRight`
+```hs
+:: Either a b -> Boolean
+```
+Returns `true` if the given `Either` instance is a `Right`, otherwise `false`.
+
 ### Instance methods
 
 #### `either.map`
