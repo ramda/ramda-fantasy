@@ -98,13 +98,13 @@ describe('Maybe usage', function() {
 
   describe('checking for Just | Nothing', function() {
     it('should allow the user to check if the instance is a Nothing', function() {
-      assert.equal(true, Maybe(null).isNothing());
-      assert.equal(false, Maybe(42).isNothing());
+      assert.equal(true, Maybe(null).isNothing);
+      assert.equal(false, Maybe(42).isNothing);
     });
 
     it('should allow the user to check if the instance is a Just', function() {
-      assert.equal(true, Maybe(42).isJust());
-      assert.equal(false, Maybe(null).isJust());
+      assert.equal(true, Maybe(42).isJust);
+      assert.equal(false, Maybe(null).isJust);
     });
 
     it('can check the type statically', function() {

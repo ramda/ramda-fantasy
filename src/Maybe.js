@@ -11,8 +11,14 @@ function _Just(x) {
 }
 util.extend(_Just, Maybe);
 
+_Just.prototype.isJust = true;
+_Just.prototype.isNothing = false;
+
 function _Nothing() {}
 util.extend(_Nothing, Maybe);
+
+_Nothing.prototype.isNothing = true;
+_Nothing.prototype.isJust = false;
 
 var _nothing = new _Nothing();
 
@@ -29,11 +35,11 @@ Maybe.of = Maybe.Just;
 Maybe.prototype.of = Maybe.Just;
 
 Maybe.isJust = function(x) {
-  return x instanceof _Just;
+  return x.isJust;
 };
 
 Maybe.isNothing = function(x) {
-  return x === _nothing;
+  return x.isNothing;
 };
 
 Maybe.maybe = R.curry(function(nothingVal, justFn, m) {
