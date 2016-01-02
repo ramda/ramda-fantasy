@@ -30,7 +30,8 @@
     "test": "mocha"
   },
   "dependencies": {
-    "ramda": ">=0.15.0 <=0.19.0"
+    "ramda": ">=0.15.0 <=0.19.0",
+    "sanctuary-def": "0.1.x"
   },
   "devDependencies": {
     "jscs": "1.13.x",
