@@ -24,6 +24,7 @@ Either.of = Either.prototype.of = function(value) {
 
 Either.prototype.chain = util.returnThis; // throw?
 
+
 Either.equals = Either.prototype.equals = util.getEquals(Either);
 
 Either.either = R.curry(function either(leftFn, rightFn, e) {
@@ -36,12 +37,23 @@ Either.either = R.curry(function either(leftFn, rightFn, e) {
   }
 });
 
+Either.isLeft = function(x) {
+  return x.isLeft;
+};
+
+Either.isRight = function(x) {
+  return x.isRight;
+};
+
 
 // Right
 function _Right(x) {
   this.value = x;
 }
 util.extend(_Right, Either);
+
+_Right.prototype.isRight = true;
+_Right.prototype.isLeft = false;
 
 _Right.prototype.map = function(fn) {
   return new _Right(fn(this.value));
@@ -77,6 +89,9 @@ function _Left(x) {
   this.value = x;
 }
 util.extend(_Left, Either);
+
+_Left.prototype.isLeft = true;
+_Left.prototype.isRight = false;
 
 _Left.prototype.ap = util.returnThis;
 
