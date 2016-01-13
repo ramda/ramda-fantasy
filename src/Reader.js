@@ -85,12 +85,6 @@ Reader.T = function(M) {
     });
   };
 
-  ReaderT.prototype.equals = function(that) {
-    return this === that ||
-      this.run === that.run ||
-      R.equals(this.run().get(), that.run().get());
-  };
-
   ReaderT.prototype.toString = function() {
     return 'ReaderT[' + M.name + '](' + R.toString(this.run) + ')';
   };
