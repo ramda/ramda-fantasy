@@ -29,7 +29,7 @@ will not be executed until the `runIO` method is called.
 ## Interaction
 
 An `IO` instance implements the monad specification, allowing the results of the
-actions to be transformed or chained together. The `forkIO` method can then be
+actions to be transformed or chained together. The `runIO` method can then be
 called to finally execute the action. Execution of an `IO` instance is
 recommended to be delegated to the outer edges of an application, to the point
 where an application will consist of a single `IO` instance at the entry point.
@@ -43,7 +43,7 @@ loudCat = argsIO.chain(R.traverse(IO.of, readFile))
                 .map(R.toUpper)
                 .chain(stdoutWrite);
 
-loudCat.forkIO();
+loudCat.runIO();
 ```
 
 ## Reference
