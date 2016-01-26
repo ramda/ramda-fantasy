@@ -1,4 +1,7 @@
-var R = require('ramda');
+var curry = require('ramda/src/curry');
+var forEach = require('ramda/src/forEach');
+var once = require('ramda/src/once');
+var toString = require('ramda/src/toString');
 
 function jail(handler, f){
   return function(a){
@@ -33,7 +36,7 @@ Future.prototype.ap = function(m) {
 
   return new Future(function(rej, res) {
     var applyFn, val;
-    var doReject = R.once(rej);
+    var doReject = once(rej);
 
     var resolveIfDone = jail(doReject, function() {
       if (applyFn != null && val != null) {
@@ -110,7 +113,7 @@ Future.reject = function(val) {
 };
 
 Future.prototype.toString = function() {
-  return 'Future(' + R.toString(this._fork) + ')';
+  return 'Future(' + toString(this._fork) + ')';
 };
 
 Future.cache = function(f) {
@@ -118,11 +121,11 @@ Future.cache = function(f) {
   var listeners = [];
   var cachedValue;
 
-  var handleCompletion = R.curry(function(newStatus, cb, val) {
+  var handleCompletion = curry(function(newStatus, cb, val) {
     status = newStatus;
     cachedValue = val;
     cb(val);
-    R.forEach(function(listener) {
+    forEach(function(listener) {
       listener[status](cachedValue);
     }, listeners);
   });

@@ -1,8 +1,7 @@
-var R = require('ramda');
+var compose = require('ramda/src/compose');
+var toString = require('ramda/src/toString');
 
 module.exports = IO;
-
-var compose = R.compose;
 
 function IO(fn) {
   if (!(this instanceof IO)) {
@@ -48,5 +47,5 @@ IO.prototype.of = function(x) {
 IO.of = IO.prototype.of;
 
 IO.prototype.toString = function() {
-  return 'IO(' + R.toString(this.fn) + ')';
+  return 'IO(' + toString(this.fn) + ')';
 };

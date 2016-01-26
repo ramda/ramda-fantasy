@@ -1,4 +1,5 @@
-var R = require('ramda');
+var equals = require('ramda/src/equals');
+var toString = require('ramda/src/toString');
 
 
 function Tuple(x, y) {
@@ -23,7 +24,7 @@ function _Tuple(x, y) {
 function ensureConcat(xs) {
   xs.forEach(function(x) {
     if (typeof x.concat != 'function') {
-      throw new TypeError(R.toString(x) + ' must be a semigroup to perform this operation');
+      throw new TypeError(toString(x) + ' must be a semigroup to perform this operation');
     }
   });
 }
@@ -55,11 +56,11 @@ _Tuple.prototype.ap = function(m) {
 
 // setoid
 _Tuple.prototype.equals = function(that) {
-  return that instanceof _Tuple && R.equals(this[0], that[0]) && R.equals(this[1], that[1]);
+  return that instanceof _Tuple && equals(this[0], that[0]) && equals(this[1], that[1]);
 };
 
 _Tuple.prototype.toString = function() {
-  return 'Tuple(' + R.toString(this[0]) + ', ' + R.toString(this[1]) + ')';
+  return 'Tuple(' + toString(this[0]) + ', ' + toString(this[1]) + ')';
 };
 
 module.exports = Tuple;

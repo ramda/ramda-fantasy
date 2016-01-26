@@ -1,4 +1,4 @@
-var R = require('ramda');
+var toString = require('ramda/src/toString');
 
 var util = require('./internal/util');
 
@@ -80,7 +80,7 @@ Identity.prototype.get = function() {
 Identity.prototype.equals = util.getEquals(Identity);
 
 Identity.prototype.toString = function() {
-  return 'Identity(' + R.toString(this.value) + ')';
+  return 'Identity(' + toString(this.value) + ')';
 };
 
 module.exports = Identity;

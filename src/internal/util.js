@@ -1,4 +1,4 @@
-var _equals = require('ramda').equals;
+var _equals = require('ramda/src/equals');
 
 
 module.exports = {
