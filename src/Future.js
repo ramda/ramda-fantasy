@@ -103,6 +103,31 @@ Future.prototype.bimap = function(errFn, successFn) {
   });
 };
 
+// semigroup
+// concat
+// Select the earlier of two Futures, effectively creating a race between them
+//:: Future a, b => Future a, b -> Future a, b
+
+Future.prototype.concat = function(m2) {
+  var m1 = this;
+
+  return new Future(function(reject, resolve){
+    var settled = false;
+
+    var once = function(f){
+      return function(a){
+        if(!settled){
+          settled = true;
+          f(a);
+        }
+      };
+    };
+
+    m1._fork(once(reject), once(resolve));
+    m2._fork(once(reject), once(resolve));
+  });
+};
+
 Future.reject = function(val) {
   return new Future(function(reject) {
     reject(val);

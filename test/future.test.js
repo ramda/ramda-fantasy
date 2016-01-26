@@ -23,10 +23,44 @@ Future.prototype.equals = function(b) {
 
 describe('Future', function() {
 
+  function delayError(delay, err) {
+    return new Future(function(reject) {
+      setTimeout(reject, delay, err);
+    });
+  }
+
+  function delayValue(delay, value) {
+    return new Future(function(reject, resolve) {
+      setTimeout(resolve, delay, value);
+    });
+  }
+
+  function assertCbVal(done, expectedVal) {
+    return function(val) {
+      assert.equal(expectedVal, val);
+      done();
+    };
+  }
+
+  function fail(done){
+    return function(x){
+      done(new Error('Forked to unexpected branch with value: ' + R.toString(x)));
+    };
+  }
+
   it('should equal another future', function() {
     var f1 = Future.of(2);
     var f2 = Future.of(2);
     assert.equal(true, f1.equals(f2));
+  });
+
+  it('is a Semigroup', function() {
+    var sTest = types.semigroup;
+    var good = Future.of(2);
+    var bad = Future.reject(-2);
+    var slow = delayValue(10, 1);
+    assert.equal(true, sTest.iface(good));
+    assert.equal(true, sTest.associative(good, bad, slow));
   });
 
   it('is a Functor', function() {
@@ -98,25 +132,6 @@ describe('Future', function() {
   describe('#ap', function() {
     /*jshint browser:true */
     var add = R.add;
-    function delayError(delay, err) {
-      /*jshint unused:false */
-      return new Future(function(reject, resolve) {
-        setTimeout(reject, delay, err);
-      });
-    }
-
-    function delayValue(delay, value) {
-      return new Future(function(reject, resolve) {
-        setTimeout(resolve, delay, value);
-      });
-    }
-
-    function assertCbVal(done, expectedVal) {
-      return function(val) {
-        assert.equal(expectedVal, val);
-        done();
-      };
-    }
 
     it('applies its function to the passed in future', function() {
       var f1 = Future.of(add(1));
@@ -191,6 +206,40 @@ describe('Future', function() {
 
   });
 
+  describe('#concat', function() {
+
+    it('resolves as soon as the first Future settles', function(done){
+      this.timeout(25);
+      delayValue(15, 1).concat(delayValue(100, 2)).fork(fail(done), assertCbVal(done, 1));
+    });
+
+    it('rejects if the first to settle rejects', function(done){
+      this.timeout(25);
+      delayError(15, 1).concat(delayValue(100, 2)).fork(assertCbVal(done, 1), fail(done));
+    });
+
+    it('associativity is not broken by race-conditions', function(done){
+      var i, assoc = types.semigroup.associative;
+
+      var randomDelayValue = function(value){
+        return Future(function(reject, resolve){
+          setTimeout(resolve, 5 + Math.round(Math.random() * 20), value);
+        });
+      };
+
+      var f1 = randomDelayValue(1);
+      var f2 = randomDelayValue(2);
+      var f3 = randomDelayValue(3);
+
+      for(i=0; i<20; i++){
+        assert.equal(true, assoc(f1, f2, f3));
+      }
+
+      setTimeout(done, 50);
+    });
+
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of a Future', function() {
@@ -211,11 +260,6 @@ describe('Future', function() {
     };
     var setErrorResult = function(e) {
       result = e.message;
-    };
-    var delayValue = function(delay, value) {
-      return new Future(function(reject, resolve) {
-        setTimeout(resolve, delay, value);
-      });
     };
 
     beforeEach(function() {
