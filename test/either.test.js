@@ -30,7 +30,9 @@ describe('Either', function() {
 
   it('is an Apply', function() {
     var aTest = types.apply;
-    jsv.assert(jsv.forall(eFnArb, eFnArb, eNatArb, aTest.compose));
+    var rNatArb = rightArb(jsv.nat);
+    var rFnArb = rightArb(jsv.fn(jsv.nat));
+    jsv.assert(jsv.forall(rFnArb, rFnArb, rNatArb, aTest.compose));
     jsv.assert(jsv.forall(eNatArb, aTest.iface));
   });
 

@@ -1,113 +1,165 @@
 var R = require('ramda');
-
-var util = require('./internal/util');
-
-
-function Either(left, right) {
-  switch (arguments.length) {
-    case 0:
-      throw new TypeError('no arguments to Either');
-    case 1:
-      return function(right) {
-        return right == null ? Either.Left(left) : Either.Right(right);
-      };
-    default:
-      return right == null ? Either.Left(left) : Either.Right(right);
-  }
-}
-
-Either.prototype.map = util.returnThis;
-
-Either.of = Either.prototype.of = function(value) {
-  return Either.Right(value);
-};
-
-Either.prototype.chain = util.returnThis; // throw?
+var $ = require('sanctuary-def');
 
 
-Either.equals = Either.prototype.equals = util.getEquals(Either);
+var a = $.TypeVariable('a');
+var b = $.TypeVariable('b');
+var c = $.TypeVariable('c');
+var d = $.TypeVariable('d');
 
-Either.either = R.curry(function either(leftFn, rightFn, e) {
-  if (e instanceof _Left) {
-    return leftFn(e.value);
-  } else if (e instanceof _Right) {
-    return rightFn(e.value);
-  } else {
-    throw new TypeError('invalid type given to Either.either');
-  }
-});
+//  $Either :: Type -> Type -> Type
+var $Either = $.BinaryType(
+  'ramda-fantasy/Either',
+  function(x) { return x instanceof Either; },
+  function(e) { return e.isLeft ? [e.value] : []; },
+  function(e) { return e.isRight ? [e.value] : []; }
+);
 
-Either.isLeft = function(x) {
-  return x.isLeft;
-};
+var def = $.create($.env.concat([$Either]));
 
-Either.isRight = function(x) {
-  return x.isRight;
+var method = function method(name, constraints, types, _f) {
+  var f = def(name, constraints, types, _f);
+  return def(name, constraints, R.tail(types), function() {
+    return R.apply(f, R.prepend(this, arguments));
+  });
 };
 
 
-// Right
-function _Right(x) {
-  this.value = x;
-}
-util.extend(_Right, Either);
+function Either() {}
 
-_Right.prototype.isRight = true;
-_Right.prototype.isLeft = false;
+//. ### Constructors
 
-_Right.prototype.map = function(fn) {
-  return new _Right(fn(this.value));
-};
+//# Either.Left :: a -> Either a b
+Either.Left =
+def('Either.Left',
+    {},
+    [a, $Either(a, b)],
+    function Left(value) {
+      var e = new Either();
+      e.value = value;
+      e.isLeft = true;
+      e.isRight = false;
+      return e;
+    });
 
-_Right.prototype.ap = function(that) {
-  return that.map(this.value);
-};
+//# Either.Right :: b -> Either a b
+Either.Right =
+def('Either.Right',
+    {},
+    [b, $Either(a, b)],
+    function Right(value) {
+      var e = new Either();
+      e.value = value;
+      e.isLeft = false;
+      e.isRight = true;
+      return e;
+    });
 
-_Right.prototype.chain = function(f) {
-  return f(this.value);
-};
+//. ### Static functions
 
-_Right.prototype.bimap = function(_, f) {
-  return new _Right(f(this.value));
-};
+//# Either.either :: (a -> c) -> (b -> c) -> Either a b -> c
+Either.either =
+def('Either.either',
+    {},
+    [$.Function, $.Function, $Either(a, b), c],
+    function either(leftFn, rightFn, e) {
+      return e.isLeft ? leftFn(e.value) : rightFn(e.value);
+    });
 
-_Right.prototype.extend = function(f) {
-  return new _Right(f(this));
-};
+//# Either.equals :: Either a b -> Any -> Boolean
+Either.equals =
+def('Either.equals',
+    {},
+    [$Either(a, b), $.Any, $.Boolean],
+    function equals(e, x) {
+      return x instanceof Either &&  // XXX: Unreliable check.
+             x.isLeft === e.isLeft &&
+             R.equals(x.value, e.value);
+    });
 
-_Right.prototype.toString = function() {
-  return 'Either.Right(' + R.toString(this.value) + ')';
-};
+//# Either.isLeft :: Either a b -> Boolean
+Either.isLeft =
+def('Either.isLeft',
+    {},
+    [$Either(a, b), $.Boolean],
+    function isLeft(x) { return x.isLeft; });
 
-Either.Right = function(value) {
-  return new _Right(value);
-};
+//# Either.isRight :: Either a b -> Boolean
+Either.isRight =
+def('Either.isRight',
+    {},
+    [$Either(a, b), $.Boolean],
+    function isRight(x) { return x.isRight; });
 
+//# Either.of :: b -> Either a b
+Either.of =
+def('Either.of',
+    {},
+    [b, $Either(a, b)],
+    Either.Right);
 
-// Left
-function _Left(x) {
-  this.value = x;
-}
-util.extend(_Left, Either);
+//. ### Instance methods
 
-_Left.prototype.isLeft = true;
-_Left.prototype.isRight = false;
+//# Either#ap :: Either a (b -> c) ~> Either a b -> Either a c
+Either.prototype.ap =
+method('Either#ap',
+       {},
+       [$Either(a, $.Function), $Either(a, b), $Either(a, c)],
+       function ap(e, e2) { return e.isLeft ? e : e2.map(e.value); });
 
-_Left.prototype.ap = util.returnThis;
+//# Either#bimap :: Either a b ~> (a -> c) -> (b -> d) -> Either c d
+Either.prototype.bimap =
+method('Either#bimap',
+       {},
+       [$Either(a, b), $.Function, $.Function, $Either(c, d)],
+       function bimap(e, l, r) {
+         return e.isLeft ? Either.Left(l(e.value)) : Either.Right(r(e.value));
+       });
 
-_Left.prototype.bimap = function(f) {
-  return new _Left(f(this.value));
-};
+//# Either#chain :: Either a b ~> (b -> Either a c) -> Either a c
+Either.prototype.chain =
+method('Either#chain',
+       {},
+       [$Either(a, b), $.Function, $Either(a, c)],
+       function chain(e, f) { return e.isLeft ? e : f(e.value); });
 
-_Left.prototype.extend = util.returnThis;
+//# Either#equals :: Either a b ~> Any -> Boolean
+Either.prototype.equals =
+method('Either#equals',
+       {},
+       [$Either(a, b), $.Any, $.Boolean],
+       Either.equals);
 
-_Left.prototype.toString = function() {
-  return 'Either.Left(' + R.toString(this.value) + ')';
-};
+//# Either#extend :: Either a b ~> (Either a b -> c) -> Either a c
+Either.prototype.extend =
+method('Either#extend',
+       {},
+       [$Either(a, b), $.Function, $Either(a, c)],
+       function extend(e, f) { return e.isLeft ? e : Either.Right(f(e)); });
 
-Either.Left = function(value) {
-  return new _Left(value);
-};
+//# Either#map :: Either a b ~> (b -> c) -> Either a c
+Either.prototype.map =
+method('Either#map',
+       {},
+       [$Either(a, b), $.Function, $Either(a, c)],
+       function map(e, f) { return e.isLeft ? e : Either.Right(f(e.value)); });
+
+//# Either#of :: Either a b ~> c -> Either a c
+Either.prototype.of =
+method('Either#of',
+       {},
+       [$Either(a, b), c, $Either(a, c)],
+       function of(e, x) { return Either.Right(x); });
+
+//# Either#toString :: Either a b ~> String
+Either.prototype.toString =
+method('Either#toString',
+       {},
+       [$Either(a, b), $.String],
+       function toString(e) {
+         var ctorName = e.isLeft ? 'Left' : 'Right';
+         return 'Either.' + ctorName + '(' + R.toString(e.value) + ')';
+       });
 
 
 module.exports = Either;
