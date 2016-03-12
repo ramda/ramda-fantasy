@@ -30,7 +30,7 @@
     "type"
   ],
   "dependencies": {
-    "ramda": "0.1.x"
+    "ramda": ">=0.1.4"
   },
   "devDependencies": {
     "jshint": "~2.7.0",
