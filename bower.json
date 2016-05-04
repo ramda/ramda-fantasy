@@ -1,7 +1,7 @@
 {
   "name": "ramda-fantasy",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "authors": [
     {
       "name": "Michael Hurley",
