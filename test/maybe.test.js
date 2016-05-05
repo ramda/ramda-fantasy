@@ -129,6 +129,15 @@ describe('Maybe usage', function() {
 
   });
 
+  describe('#@@type', function() {
+
+    it('is "ramda-fantasy/Maybe"', function() {
+      assert.strictEqual(Maybe.Just(null)['@@type'], 'ramda-fantasy/Maybe');
+      assert.strictEqual(Maybe.Nothing()['@@type'], 'ramda-fantasy/Maybe');
+    });
+
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of a Just', function() {

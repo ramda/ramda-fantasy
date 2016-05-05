@@ -6,6 +6,8 @@ function Maybe(x) {
   return x == null ? _nothing : Maybe.Just(x);
 }
 
+Maybe.prototype['@@type'] = 'ramda-fantasy/Maybe';
+
 function Just(x) {
   this.value = x;
 }

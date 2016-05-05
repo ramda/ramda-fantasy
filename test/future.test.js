@@ -191,6 +191,17 @@ describe('Future', function() {
 
   });
 
+  describe('#@@type', function() {
+
+    it('is "ramda-fantasy/Future"', function() {
+      assert.strictEqual(
+        Future(function(reject, resolve) { void resolve; })['@@type'],
+        'ramda-fantasy/Future'
+      );
+    });
+
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of a Future', function() {

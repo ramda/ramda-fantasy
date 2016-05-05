@@ -110,6 +110,15 @@ describe('Either', function() {
     });
   });
 
+  describe('#@@type', function() {
+
+    it('is "ramda-fantasy/Either"', function() {
+      assert.strictEqual(Either.Left(null)['@@type'], 'ramda-fantasy/Either');
+      assert.strictEqual(Either.Right(null)['@@type'], 'ramda-fantasy/Either');
+    });
+
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of a Left', function() {

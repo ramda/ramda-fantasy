@@ -90,6 +90,14 @@ describe('IO', function() {
     assert.equal(true, mTest.iface(i1));
   });
 
+  describe('#@@type', function() {
+
+    it('is "ramda-fantasy/IO"', function() {
+      assert.strictEqual(IO(function() {})['@@type'], 'ramda-fantasy/IO');
+    });
+
+  });
+
   describe('#toString', function() {
 
     it('returns the string representation of an IO', function() {

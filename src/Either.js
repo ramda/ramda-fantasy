@@ -16,6 +16,8 @@ function Either(left, right) {
   }
 }
 
+Either.prototype['@@type'] = 'ramda-fantasy/Either';
+
 Either.prototype.map = util.returnThis;
 
 Either.of = Either.prototype.of = function(value) {
