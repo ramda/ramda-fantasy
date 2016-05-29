@@ -101,7 +101,7 @@ instance is a `Left`, the value is left unmodified.
 ```
 Applies the function contained in the instance of a `Right` to the value
 contained in the provided `Right`, producing a `Right` containing the result. If
-the instance is `Left`, the result will be the the `Left` instance. If the
+the instance is `Left`, the result will be the `Left` instance. If the
 instance is `Right` and the provided either is `Left`, the result will be the
 provided `Left`.
 
