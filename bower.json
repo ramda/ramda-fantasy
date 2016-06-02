@@ -12,6 +12,7 @@
       "name": "Ludwig Magnusson"
     }
   ],
+  "main": "index.js",
   "homepage": "https://www.github.com/ramda/ramda-fantasy",
   "license": "MIT",
   "moduleType": [
@@ -29,7 +30,7 @@
     "type"
   ],
   "dependencies": {
-    "ramda": "^0.14.0"
+    "ramda": ">=0.1.4"
   },
   "devDependencies": {
     "jshint": "~2.7.0",
