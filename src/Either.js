@@ -20,6 +20,8 @@ Either.prototype['@@type'] = 'ramda-fantasy/Either';
 
 Either.prototype.map = util.returnThis;
 
+Either.prototype.getOrElse = util.returnThis;
+
 Either.of = Either.prototype.of = function(value) {
   return Either.Right(value);
 };
@@ -73,6 +75,10 @@ _Right.prototype.bimap = function(_, f) {
   return new _Right(f(this.value));
 };
 
+_Right.prototype.getOrElse = function() {
+  return this.value;
+};
+
 _Right.prototype.extend = function(f) {
   return new _Right(f(this));
 };
@@ -99,6 +105,10 @@ _Left.prototype.ap = util.returnThis;
 
 _Left.prototype.bimap = function(f) {
   return new _Left(f(this.value));
+};
+
+_Left.prototype.getOrElse = function(x) {
+  return x;
 };
 
 _Left.prototype.extend = util.returnThis;
