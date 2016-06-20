@@ -1,7 +1,7 @@
 {
   "name": "ramda-fantasy",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "authors": [
     {
       "name": "Michael Hurley",
@@ -29,7 +29,7 @@
     "type"
   ],
   "dependencies": {
-    "ramda": "^0.14.0"
+    "ramda": ">=0.15.0 <=0.21.x"
   },
   "devDependencies": {
     "jshint": "~2.7.0",
