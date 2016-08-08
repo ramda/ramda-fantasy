@@ -125,7 +125,7 @@ the returned `Future` instance will be rejected with that value.
 ```hs
 :: Future e a ~> (e -> Future e b) -> Future e b
 ```
-If this `Future` instance is rejected, the provided function is be called with
+If this `Future` instance is rejected, the provided function will be called with
 the rejected value, where a new `Future` instance must be returned. This can
 be used to recover from a rejected `Future` instance. If this `Future` instance
 is resolved, the provided function will be ignored.
