@@ -29,7 +29,7 @@
     "type"
   ],
   "dependencies": {
-    "ramda": ">=0.15.0 <=0.21.x"
+    "ramda": ">=0.15.0 <=0.22.x"
   },
   "devDependencies": {
     "jshint": "~2.7.0",
