@@ -1,4 +1,5 @@
-var R = require('ramda');
+var toString = require('ramda/src/toString');
+var curry = require('ramda/src/curry');
 
 var util = require('./internal/util.js');
 
@@ -44,7 +45,7 @@ Maybe.isNothing = function(x) {
   return x.isNothing;
 };
 
-Maybe.maybe = R.curry(function(nothingVal, justFn, m) {
+Maybe.maybe = curry(function(nothingVal, justFn, m) {
   return m.reduce(function(_, x) {
     return justFn(x);
   }, nothingVal);
@@ -120,7 +121,7 @@ Nothing.prototype.reduce = function(f, x) {
 };
 
 Just.prototype.toString = function() {
-  return 'Maybe.Just(' + R.toString(this.value) + ')';
+  return 'Maybe.Just(' + toString(this.value) + ')';
 };
 
 Nothing.prototype.toString = function() {
