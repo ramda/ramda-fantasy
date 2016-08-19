@@ -1,4 +1,4 @@
-var R = require('ramda');
+var curry = require('ramda/src/curry');
 
 var Identity = require('./Identity');
 var Tuple = require('./Tuple');
@@ -36,7 +36,7 @@ function T(M) {
   };
   StateT.prototype.ap = util.deriveAp(StateT);
   StateT.prototype.map = util.deriveMap(StateT);
-  StateT.tailRec = R.curry(function(stepFn, init) {
+  StateT.tailRec = curry(function(stepFn, init) {
     return StateT(function(s) {
       return M.tailRec(function(t) {
         return stepFn(Tuple.fst(t))._run(Tuple.snd(t)).chain(function (t_) {
