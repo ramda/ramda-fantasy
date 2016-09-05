@@ -43,6 +43,18 @@ describe('Maybe', function() {
     jsv.assert(arb);
   });
 
+  it('is a Semigroup', function() {
+    var sTest = types.semigroup;
+
+    // Inner type needs to be a semigroup.
+    var s = MaybeArb(jsv.array(jsv.nat));
+    var s1 = MaybeArb(jsv.array(jsv.nat));
+    var s2 = MaybeArb(jsv.array(jsv.nat));
+
+    jsv.assert(jsv.forall(s, sTest.iface));
+    jsv.assert(jsv.forall(s, s1, s2, sTest.associative));
+  });
+
   it('is a Functor', function() {
     var fTest = types.functor;
 
