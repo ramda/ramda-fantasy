@@ -38,6 +38,18 @@ module.exports = {
 
   returnThis: function() { return this; },
 
+  chainRecNext: function(v) {
+    return { done: false, value: v};
+  },
+
+  chainRecDone: function(v) {
+    return { done: true, value: v};
+  },
+
+  chainRecFold: function(v, onNext, onDone) {
+    return (v.done ? onDone : onNext)(v.value);
+  },
+
   deriveAp: function (Type) {
     return function(fa) {
       return this.chain(function (f) {
