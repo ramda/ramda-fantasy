@@ -3,38 +3,71 @@ var assert = require('assert');
 var equalsInvoker = require('./utils').equalsInvoker;
 var types = require('./types')(equalsInvoker);
 var Future = require('../src/Future');
+var Promise = require('promise');
 
 Future.prototype.equals = function(b) {
-  this.fork(function(e1) {
-    b.fork(function(e2) {
-      assert.equal(e1, e2);
-    }, function() {
-      assert.fail(null, e1, 'Futures not equal: f1 failed, f2 did not', '===');
-    });
-  }, function(v1) {
-    b.fork(function() {
-      assert.fail(null, v1, 'Futures not equal: f1 succeeded, f2 did not', '===');
-    }, function(v2) {
-      assert.equal(v1, v2);
+  var self = this;
+  return new Promise(function(resolve, reject) {
+    self.fork(function(e1) {
+      b.fork(function(e2) {
+        try {
+          assert.deepEqual(e1, e2);
+        } catch (e) { reject(e); }
+        resolve();
+      }, function() {
+        try{
+          assert.fail(null, e1, 'Futures not equal: f1 failed, f2 did not', '===');
+        } catch (e) { reject(e); }
+        reject();
+      });
+    }, function(v1) {
+      b.fork(function() {
+        try{
+          assert.fail(null, v1, 'Futures not equal: f1 succeeded, f2 did not', '===');
+        } catch (e) { reject(e); }
+        reject();
+      }, function(v2) {
+        try {
+          assert.deepEqual(v1, v2);
+        } catch (e) { reject(e); }
+        resolve();
+      });
     });
   });
-  return true;
 };
 
 describe('Future', function() {
 
-  it('should equal another future', function() {
-    var f1 = Future.of(2);
-    var f2 = Future.of(2);
-    assert.equal(true, f1.equals(f2));
+  describe('Equal', function() {
+    it('should equal another future', function() {
+      var f1 = Future.of(2);
+      var f2 = Future.of(2);
+      return f1.equals(f2);
+    });
+
+    it('should equal another future (async)', function() {
+      var f1 = Future.of(2);
+      var f2 = Future(function(rej, res) {
+        setTimeout(res, 1, 2);
+      });
+      return f1.equals(f2);
+    });
+
+    it('should equal another future (non-primitive value)', function() {
+      var f1 = Future.of([2,2]);
+      var f2 = Future.of([2,2]);
+      return f1.equals(f2);
+    });
   });
 
   it('is a Functor', function() {
     var fTest = types.functor;
     var f = Future.of(2);
     assert.equal(true, fTest.iface(f));
-    assert.equal(true, fTest.id(f));
-    assert.equal(true, fTest.compose(f, R.multiply(2), R.add(3)));
+    return Promise.all([
+      fTest.id(f),
+      fTest.compose(f, R.multiply(2), R.add(3))
+    ]);
   });
 
   it('is an Apply', function() {
@@ -43,7 +76,7 @@ describe('Future', function() {
     var appU = Future.of(R.add(5));
     var appV = Future.of(10);
     assert.equal(true, aTest.iface(appA));
-    assert.equal(true, aTest.compose(appA, appU, appV));
+    return aTest.compose(appA, appU, appV);
   });
 
   it('is an Applicative', function() {
@@ -53,9 +86,11 @@ describe('Future', function() {
     var appF = Future.of(R.multiply(3));
 
     assert.equal(true, aTest.iface(app1));
-    assert.equal(true, aTest.id(app1, app2));
-    assert.equal(true, aTest.homomorphic(app1, R.add(3), 46));
-    assert.equal(true, aTest.interchange(app1, appF, 17));
+    return Promise.all([
+      aTest.id(app1, app2),
+      aTest.homomorphic(app1, R.add(3), 46),
+      aTest.interchange(app1, appF, 17),
+    ]);
   });
 
   it('is a Chain', function() {
@@ -65,7 +100,7 @@ describe('Future', function() {
     var f2 = function(x) {return Future.of((5 + x));};
 
     assert.equal(true, cTest.iface(f));
-    assert.equal(true, cTest.associative(f, f1, f2));
+    return cTest.associative(f, f1, f2);
   });
 
   it('is a Monad', function() {
@@ -76,7 +111,7 @@ describe('Future', function() {
 
   it('.map should work according to the functor specification', function() {
     var result = Future.of(1).map(R.inc);
-    assert.equal(true, Future.of(2).equals(result));
+    return Future.of(2).equals(result);
   });
 
   it('.chain should work according to the chainable specification', function() {
@@ -84,14 +119,14 @@ describe('Future', function() {
       return Future.of(R.inc(val));
     };
     var result = Future.of(1).chain(incInTheFuture);
-    assert.equal(true, Future.of(2).equals(result));
+    return Future.of(2).equals(result);
   });
 
   describe('chainReject', function() {
     it('.chainReject should work like chain but off reject case', function() {
       var f1 = Future.reject(2);
       var f2 = function(val){ return Future.of(val + 3);};
-      assert.equal(true, Future.of(5).equals(f1.chainReject(f2)));
+      return Future.of(5).equals(f1.chainReject(f2));
     });
   });
 
@@ -121,7 +156,7 @@ describe('Future', function() {
     it('applies its function to the passed in future', function() {
       var f1 = Future.of(add(1));
       var result = f1.ap(Future.of(2));
-      assert.equal(true, Future.of(3).equals(result));
+      return Future.of(3).equals(result);
     });
 
     it('does the apply in parallel', function(done) {
@@ -396,4 +431,3 @@ describe('Future', function() {
   });
 
 });
-
