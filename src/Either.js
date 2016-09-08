@@ -70,6 +70,23 @@ _Right.prototype.chain = function(f) {
   return f(this.value);
 };
 
+//chainRec
+Either.chainRec = Either.prototype.chainRec = function(f, i) {
+  var state = util.chainRecNext(i);
+  while (state.done === false) {
+    state = Either.either(
+      function(v) {
+        return { done: true, result: v, isLeft: true };
+      },
+      function(v) {
+        return v;
+      },
+      f(util.chainRecNext, util.chainRecDone, state.value)
+    );
+  }
+  return (state.isLeft ? Either.Left : Either.Right)(state.value);
+};
+
 _Right.prototype.bimap = function(_, f) {
   return new _Right(f(this.value));
 };
