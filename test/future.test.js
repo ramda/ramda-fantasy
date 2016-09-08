@@ -103,6 +103,50 @@ describe('Future', function() {
     return cTest.associative(f, f1, f2);
   });
 
+  describe('ChainRec', function() {
+    it('is a ChainRec', function() {
+      var cTest = types.chainRec;
+      var predicate = function(a) {
+        return a.length > 5;
+      };
+      var done = Future.of;
+      var x = 1;
+      var initial = [x];
+      var next = function(a) {
+        return Future.of(a.concat([x]));
+      };
+      assert.equal(true, cTest.iface(Future.of(1)));
+      return cTest.equivalence(Future, predicate, done, next, initial);
+    });
+
+    it('sync and async Futures', function() {
+      return Future.of('DONE').equals(Future.chainRec(function(next, done, n) {
+        if (n === 0) {
+          return Future.of(done('DONE'));
+        } else if (n > 100 || n === 1) {
+          return Future.of(next(n - 1));
+        } else {
+          return new Future(function(rej, res) { setTimeout(res, 0, next(n - 1)); });
+        }
+      }, 100000));
+    });
+
+    it('fail Immediately', function() {
+      return Future.reject('ERROR').equals(Future.chainRec(function(/*next, done, n*/) {
+        return Future.reject('ERROR');
+      }, 100));
+    });
+
+    it('fail on next step', function() {
+      return Future.reject('ERROR').equals(Future.chainRec(function(next, done, n) {
+        if (n === 0) {
+          return Future.reject('ERROR');
+        }
+        return Future.of(next(n - 1));
+      }, 100));
+    });
+  });
+
   it('is a Monad', function() {
     var mTest = types.monad;
     var f = Future.of(null);

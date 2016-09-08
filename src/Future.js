@@ -82,6 +82,89 @@ Future.prototype.chain = function(f) {  // Sorella's:
   }.bind(this));
 };
 
+var chainRecFork = function(t, rej, res) {
+  var isSync = false;
+  t.fork(function(v) {
+    var r = rej(v, !isSync);
+    isSync = true;
+    return r;
+  }, function(v) {
+    var r = res(v, !isSync);
+    isSync = true;
+    return r;
+  });
+  if (isSync) {
+    return { isSync: true };
+  } else {
+    isSync = true;
+    return { isSync: false };
+  }
+};
+
+var chainRecNext = function(v) {
+  return function(onNext/*, onDone*/){
+    return onNext(v);
+  };
+};
+
+var chainRecDone = function(v) {
+  return function(onNext, onDone){
+    return onDone(v);
+  };
+};
+
+// chainRec
+Future.chainRec = Future.prototype.chainRec = function(f, i) {
+  return new Future(function(reject, resolve) {
+    chainRecFork(
+      f(chainRecNext, chainRecDone, i),
+      function(z/*, isSync*/) {
+        return reject(z);
+      },
+      function(fold, isSync) {
+        return fold(
+          function(v2) {
+            if (isSync === false) {
+              Future.chainRec(f, v2).fork(reject, resolve);
+              return;
+            }
+            var state = { loop: true, arg: v2 };
+            var onReject = function(z/*, isSync*/) {
+              state.loop = false;
+              reject(z);
+            };
+            var onResolve = function(fold, isSync) {
+              return fold(
+                function(v3) {
+                  state = { loop: isSync, arg: v3 };
+                  if (isSync === false) {
+                    Future.chainRec(f, v3).fork(reject, resolve);
+                  }
+                },
+                function(v) {
+                  state = { loop: false};
+                  resolve(v);
+                }
+              );
+            };
+            while (state.loop) {
+              var forkRes = chainRecFork(
+                f(chainRecNext, chainRecDone, state.arg),
+                onReject,
+                onResolve
+              );
+              if (forkRes.isSync === false) {
+                state = { loop: false};
+              }
+            }
+          },
+          resolve
+        );
+      }
+    );
+  });
+};
+
 // chainReject
 // Like chain but operates on the reject instead of the resolve case.
 //:: Future a, b => (a -> Future c) -> Future c
