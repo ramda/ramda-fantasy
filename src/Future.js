@@ -3,6 +3,8 @@ var forEach = require('ramda/src/forEach');
 var toString = require('ramda/src/toString');
 var curry = require('ramda/src/curry');
 
+var util = require('./internal/util');
+
 function jail(handler, f){
   return function(a){
     try{
@@ -101,44 +103,34 @@ var chainRecFork = function(t, rej, res) {
   }
 };
 
-var chainRecNext = function(v) {
-  return function(onNext/*, onDone*/){
-    return onNext(v);
-  };
-};
-
-var chainRecDone = function(v) {
-  return function(onNext, onDone){
-    return onDone(v);
-  };
-};
-
 // chainRec
 Future.chainRec = Future.prototype.chainRec = function(f, i) {
   return new Future(function(reject, resolve) {
     chainRecFork(
-      f(chainRecNext, chainRecDone, i),
+      f(util.chainRecNext, util.chainRecDone, i),
       function(z/*, isSync*/) {
         return reject(z);
       },
-      function(fold, isSync) {
-        return fold(
-          function(v2) {
+      function(step, isSync) {
+        return util.chainRecFold(
+          step,
+          function(v) {
             if (isSync === false) {
-              Future.chainRec(f, v2).fork(reject, resolve);
+              Future.chainRec(f, v).fork(reject, resolve);
               return;
             }
-            var state = { loop: true, arg: v2 };
+            var state = { loop: true, arg: v };
             var onReject = function(z/*, isSync*/) {
               state.loop = false;
               reject(z);
             };
-            var onResolve = function(fold, isSync) {
-              return fold(
-                function(v3) {
-                  state = { loop: isSync, arg: v3 };
+            var onResolve = function(step, isSync) {
+              return util.chainRecFold(
+                step,
+                function(v2) {
+                  state = { loop: isSync, arg: v2 };
                   if (isSync === false) {
-                    Future.chainRec(f, v3).fork(reject, resolve);
+                    Future.chainRec(f, v2).fork(reject, resolve);
                   }
                 },
                 function(v) {
@@ -149,7 +141,7 @@ Future.chainRec = Future.prototype.chainRec = function(f, i) {
             };
             while (state.loop) {
               var forkRes = chainRecFork(
-                f(chainRecNext, chainRecDone, state.arg),
+                f(util.chainRecNext, util.chainRecDone, state.arg),
                 onReject,
                 onResolve
               );
