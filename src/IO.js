@@ -1,6 +1,8 @@
 var compose = require('ramda/src/compose');
 var toString = require('ramda/src/toString');
 
+var util = require('./internal/util');
+
 module.exports = IO;
 
 function IO(fn) {
@@ -18,6 +20,17 @@ IO.prototype.chain = function(f) {
   return new IO(function() {
     var next = f(io.fn.apply(io, arguments));
     return next.fn.apply(next, arguments);
+  });
+};
+
+//chainRec
+IO.chainRec = IO.prototype.chainRec = function(f, i) {
+  return new IO(function() {
+    var state = util.chainRecNext(i);
+    while (state.done === false) {
+      state = f(util.chainRecNext, util.chainRecDone, state.value).fn();
+    }
+    return state.value;
   });
 };
 

@@ -5,6 +5,10 @@ var types = require('./types')(function(io1, io2) {
 
 var IO = require('..').IO;
 
+IO.prototype.equals = function(b) {
+  assert.deepEqual(this.fn(), b.fn());
+};
+
 function add(a) {
   return function(b) { return a + b; };
 }
@@ -83,6 +87,33 @@ describe('IO', function() {
     });
     assert.equal(true, cTest.iface(i1));
     assert.equal(true, cTest.associative(c, identity, identity));
+  });
+
+  describe('ChainRec', function() {
+    it('is a ChainRec', function() {
+      var cTest = types.chainRec;
+      var predicate = function(a) {
+        return a.length > 5;
+      };
+      var done = IO.of;
+      var x = 1;
+      var initial = [x];
+      var next = function(a) {
+        return IO.of(a.concat([x]));
+      };
+      assert.equal(true, cTest.iface(IO.of(1)));
+      return cTest.equivalence(IO, predicate, done, next, initial);
+    });
+
+    it('is stacksafe', function() {
+      return IO.of('DONE').equals(IO.chainRec(function(next, done, n) {
+        if (n === 0) {
+          return IO.of(done('DONE'));
+        } else {
+          return IO.of(next(n - 1));
+        }
+      }, 100000));
+    });
   });
 
   it('is a Monad', function() {
