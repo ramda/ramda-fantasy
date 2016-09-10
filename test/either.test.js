@@ -62,32 +62,32 @@ describe('Either', function() {
         return Either.of(a.concat([x]));
       };
       assert.equal(true, cTest.iface(Either.of(1)));
-      return cTest.equivalence(Either, predicate, done, next, initial);
+      assert.equal(true, cTest.equivalence(Either, predicate, done, next, initial));
     });
 
     it('is stacksafe', function() {
-      return Either.of('DONE').equals(Either.chainRec(function(next, done, n) {
+      assert.equal(true, Either.of('DONE').equals(Either.chainRec(function(next, done, n) {
         if (n === 0) {
           return Either.of(done('DONE'));
         } else {
           return Either.of(next(n - 1));
         }
-      }, 100000));
+      }, 100000)));
     });
 
     it('fail Immediately', function() {
-      return Either.Left("ERROR").equals(Either.chainRec(function(/*next, done, n*/) {
+      assert.equal(true, Either.Left("ERROR").equals(Either.chainRec(function(/*next, done, n*/) {
         return Either.Left("ERROR");
-      }, 100));
+      }, 100)));
     });
 
     it('fail on next step', function() {
-      return Either.Left("ERROR").equals(Either.chainRec(function(next, done, n) {
+      assert.equal(true, Either.Left("ERROR").equals(Either.chainRec(function(next, done, n) {
         if (n === 0) {
           return Either.Left("ERROR");
         }
         return Either.of(next(n - 1));
-      }, 100));
+      }, 100)));
     });
   });
 

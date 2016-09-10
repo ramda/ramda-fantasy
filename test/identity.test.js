@@ -70,17 +70,17 @@ describe('Identity', function() {
         return Identity.of(a.concat([x]));
       };
       assert.equal(true, cTest.iface(Identity.of(1)));
-      return cTest.equivalence(Identity, predicate, done, next, initial);
+      assert.equal(true, cTest.equivalence(Identity, predicate, done, next, initial));
     });
 
     it('is stacksafe', function() {
-      return Identity.of('DONE').equals(Identity.chainRec(function(next, done, n) {
+      assert.equal(true, Identity.of('DONE').equals(Identity.chainRec(function(next, done, n) {
         if (n === 0) {
           return Identity.of(done('DONE'));
         } else {
           return Identity.of(next(n - 1));
         }
-      }, 100000));
+      }, 100000)));
     });
   });
 

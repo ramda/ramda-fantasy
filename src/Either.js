@@ -76,7 +76,7 @@ Either.chainRec = Either.prototype.chainRec = function(f, i) {
   while (state.done === false) {
     state = Either.either(
       function(v) {
-        return { done: true, result: v, isLeft: true };
+        return { done: true, value: v, isLeft: true };
       },
       function(v) {
         return v;

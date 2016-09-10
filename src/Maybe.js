@@ -87,9 +87,9 @@ Maybe.chainRec = Maybe.prototype.chainRec = function(f, i) {
     state = f(util.chainRecNext, util.chainRecDone, state.value).getOrElse({ done: true, isNothing:true });
   }
   if (state.isNothing) {
-    return Nothing();
+    return Maybe.Nothing();
   }
-  return Just(state.value);
+  return Maybe.Just(state.value);
 };
 
 

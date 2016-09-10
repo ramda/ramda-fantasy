@@ -1,12 +1,13 @@
 var assert = require('assert');
+var equals = require('ramda/src/equals');
 var types = require('./types')(function(io1, io2) {
-  return io1.runIO('x') === io2.runIO('x');
+  return io1.equals(io2);
 });
 
 var IO = require('..').IO;
 
 IO.prototype.equals = function(b) {
-  assert.deepEqual(this.fn(), b.fn());
+  return equals(this.runIO('x'), b.runIO('x'));
 };
 
 function add(a) {
@@ -102,17 +103,17 @@ describe('IO', function() {
         return IO.of(a.concat([x]));
       };
       assert.equal(true, cTest.iface(IO.of(1)));
-      return cTest.equivalence(IO, predicate, done, next, initial);
+      assert.equal(true, cTest.equivalence(IO, predicate, done, next, initial));
     });
 
     it('is stacksafe', function() {
-      return IO.of('DONE').equals(IO.chainRec(function(next, done, n) {
+      assert.equal(true, IO.of('DONE').equals(IO.chainRec(function(next, done, n) {
         if (n === 0) {
           return IO.of(done('DONE'));
         } else {
           return IO.of(next(n - 1));
         }
-      }, 100000));
+      }, 100000)));
     });
   });
 

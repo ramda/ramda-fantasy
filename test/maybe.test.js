@@ -88,23 +88,25 @@ describe('Maybe', function() {
         return Maybe.of(a.concat([x]));
       };
       assert.equal(true, cTest.iface(Maybe.of(1)));
-      return cTest.equivalence(Maybe, predicate, done, next, initial);
+      assert.equal(true, cTest.equivalence(Maybe, predicate, done, next, initial));
     });
 
     it('is stacksafe', function() {
-      return Maybe.of('DONE').equals(Maybe.chainRec(function(next, done, n) {
+      var a = Maybe.chainRec(function(next, done, n) {
         if (n === 0) {
           return Maybe.of(done('DONE'));
         } else {
           return Maybe.of(next(n - 1));
         }
-      }, 100000));
+      }, 100000);
+      console.log('a',a);
+      assert.equal(true, Maybe.of('DONE').equals(a));
     });
 
     it('fail Immediately', function() {
-      return Maybe.Nothing().equals(Maybe.chainRec(function(/*next, done, n*/) {
+      assert.equal(true, Maybe.Nothing().equals(Maybe.chainRec(function(/*next, done, n*/) {
         return Maybe.Nothing();
-      }, 100));
+      }, 100)));
     });
 
     it('fail on next step', function() {
