@@ -82,12 +82,13 @@ Nothing.prototype.chain = util.returnThis;
 
 //chainRec
 Maybe.chainRec = Maybe.prototype.chainRec = function(f, i) {
-  var state = util.chainRecNext(i);
-  while (state.done === false) {
-    state = f(util.chainRecNext, util.chainRecDone, state.value).getOrElse({ done: true, isNothing:true });
-  }
-  if (state.isNothing) {
-    return Maybe.Nothing();
+  var res, state = util.chainRecNext(i);
+  while (state.isNext) {
+    res = f(util.chainRecNext, util.chainRecDone, state.value);
+    if (Maybe.isNothing(res)) {
+      return res;
+    }
+    state = res.value;
   }
   return Maybe.Just(state.value);
 };

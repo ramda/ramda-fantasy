@@ -72,19 +72,15 @@ _Right.prototype.chain = function(f) {
 
 //chainRec
 Either.chainRec = Either.prototype.chainRec = function(f, i) {
-  var state = util.chainRecNext(i);
-  while (state.done === false) {
-    state = Either.either(
-      function(v) {
-        return { done: true, value: v, isLeft: true };
-      },
-      function(v) {
-        return v;
-      },
-      f(util.chainRecNext, util.chainRecDone, state.value)
-    );
+  var res, state = util.chainRecNext(i);
+  while (state.isNext) {
+    res = f(util.chainRecNext, util.chainRecDone, state.value);
+    if (Either.isLeft(res)) {
+      return res;
+    }
+    state = res.value;
   }
-  return (state.isLeft ? Either.Left : Either.Right)(state.value);
+  return Either.Right(state.value);
 };
 
 _Right.prototype.bimap = function(_, f) {

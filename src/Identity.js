@@ -71,7 +71,7 @@ Identity.prototype.chain = function(fn) {
 // chainRec
 Identity.chainRec = Identity.prototype.chainRec = function(f, i) {
   var state = util.chainRecNext(i);
-  while(state.done === false) {
+  while (state.isNext) {
     state = f(util.chainRecNext, util.chainRecDone, state.value).get();
   }
   return Identity(state.value);

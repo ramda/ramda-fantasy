@@ -27,7 +27,7 @@ IO.prototype.chain = function(f) {
 IO.chainRec = IO.prototype.chainRec = function(f, i) {
   return new IO(function() {
     var state = util.chainRecNext(i);
-    while (state.done === false) {
+    while (state.isNext) {
       state = f(util.chainRecNext, util.chainRecDone, state.value).fn();
     }
     return state.value;
