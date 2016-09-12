@@ -1,7 +1,7 @@
 # Future
 
 The `Future` type is used to represent some future, often asynchronous,
-action that may potentially fail. It is similar to native the JS `Promise` type,
+action that may potentially fail. It is similar to the native JS `Promise` type,
 however the computation of a `Promise` is executed immediately, while the
 execution of a `Future` instance is delayed until explicitly requested.
 
