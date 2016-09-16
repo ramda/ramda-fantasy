@@ -119,7 +119,7 @@ describe('Future', function() {
       return cTest.equivalence(Future, predicate, done, next, initial);
     });
 
-    it('sync and async Futures', function() {
+    it('works when mixing sync and async Futures', function() {
       return Future.of('DONE').equals(Future.chainRec(function(next, done, n) {
         if (n === 0) {
           return Future.of(done('DONE'));
@@ -131,13 +131,13 @@ describe('Future', function() {
       }, 100000));
     });
 
-    it('fail Immediately', function() {
+    it('responds to failure immediately', function() {
       return Future.reject('ERROR').equals(Future.chainRec(function(/*next, done, n*/) {
         return Future.reject('ERROR');
       }, 100));
     });
 
-    it('fail on next step', function() {
+    it('responds to failure on next step', function() {
       return Future.reject('ERROR').equals(Future.chainRec(function(next, done, n) {
         if (n === 0) {
           return Future.reject('ERROR');

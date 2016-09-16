@@ -75,13 +75,13 @@ describe('Either', function() {
       }, 100000)));
     });
 
-    it('fail Immediately', function() {
+    it('responds to failure immediately', function() {
       assert.equal(true, Either.Left("ERROR").equals(Either.chainRec(function(/*next, done, n*/) {
         return Either.Left("ERROR");
       }, 100)));
     });
 
-    it('fail on next step', function() {
+    it('responds to failure on next step', function() {
       assert.equal(true, Either.Left("ERROR").equals(Either.chainRec(function(next, done, n) {
         if (n === 0) {
           return Either.Left("ERROR");

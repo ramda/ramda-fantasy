@@ -103,13 +103,13 @@ describe('Maybe', function() {
       assert.equal(true, Maybe.of('DONE').equals(a));
     });
 
-    it('fail Immediately', function() {
+    it('responds to failure immediately', function() {
       assert.equal(true, Maybe.Nothing().equals(Maybe.chainRec(function(/*next, done, n*/) {
         return Maybe.Nothing();
       }, 100)));
     });
 
-    it('fail on next step', function() {
+    it('responds to failure on next step', function() {
       return Maybe.Nothing().equals(Maybe.chainRec(function(next, done, n) {
         if (n === 0) {
           return Maybe.Nothing();
