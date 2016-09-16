@@ -1,9 +1,14 @@
 var assert = require('assert');
+var equals = require('ramda/src/equals');
 var types = require('./types')(function(io1, io2) {
-  return io1.runIO('x') === io2.runIO('x');
+  return io1.equals(io2);
 });
 
 var IO = require('..').IO;
+
+IO.prototype.equals = function(b) {
+  return equals(this.runIO('x'), b.runIO('x'));
+};
 
 function add(a) {
   return function(b) { return a + b; };
@@ -83,6 +88,33 @@ describe('IO', function() {
     });
     assert.equal(true, cTest.iface(i1));
     assert.equal(true, cTest.associative(c, identity, identity));
+  });
+
+  describe('ChainRec', function() {
+    it('is a ChainRec', function() {
+      var cTest = types.chainRec;
+      var predicate = function(a) {
+        return a.length > 5;
+      };
+      var done = IO.of;
+      var x = 1;
+      var initial = [x];
+      var next = function(a) {
+        return IO.of(a.concat([x]));
+      };
+      assert.equal(true, cTest.iface(IO.of(1)));
+      assert.equal(true, cTest.equivalence(IO, predicate, done, next, initial));
+    });
+
+    it('is stacksafe', function() {
+      assert.equal(true, IO.of('DONE').equals(IO.chainRec(function(next, done, n) {
+        if (n === 0) {
+          return IO.of(done('DONE'));
+        } else {
+          return IO.of(next(n - 1));
+        }
+      }, 100000)));
+    });
   });
 
   it('is a Monad', function() {

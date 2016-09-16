@@ -5,6 +5,7 @@ var interfaces = {
   apply:          ['map', 'ap'],
   applicative:    ['map', 'ap', 'of'],
   chain:          ['map', 'ap', 'chain'],
+  chainRec:       ['map', 'ap', 'chain', 'chainRec'],
   monad:          ['map', 'ap', 'chain', 'of'],
   extend:         ['extend'],
   comonad:        ['extend', 'extract'],
@@ -90,6 +91,19 @@ module.exports = function(eq) {
           obj.chain(function (x) {
             return f(x).chain(g);
           })
+        );
+      }
+    },
+    chainRec: {
+      iface: correctInterface('chainRec'),
+      equivalence: function (T, p, d, n, x) {
+        return eq(
+          T.chainRec(function(next, done, v) {
+            return p(v) ? d(v).map(done) : n(v).map(next);
+          }, x),
+          (function step(v) {
+            return p(v) ? d(v) : n(v).chain(step);
+          }(x))
         );
       }
     },

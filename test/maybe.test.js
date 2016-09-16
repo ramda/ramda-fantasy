@@ -75,6 +75,50 @@ describe('Maybe', function() {
     jsv.assert(jsv.forall(m, f, f, env, cTest.associative));
   });
 
+  describe('ChainRec', function() {
+    it('is a ChainRec', function() {
+      var cTest = types.chainRec;
+      var predicate = function(a) {
+        return a.length > 5;
+      };
+      var done = Maybe.of;
+      var x = 1;
+      var initial = [x];
+      var next = function(a) {
+        return Maybe.of(a.concat([x]));
+      };
+      assert.equal(true, cTest.iface(Maybe.of(1)));
+      assert.equal(true, cTest.equivalence(Maybe, predicate, done, next, initial));
+    });
+
+    it('is stacksafe', function() {
+      var a = Maybe.chainRec(function(next, done, n) {
+        if (n === 0) {
+          return Maybe.of(done('DONE'));
+        } else {
+          return Maybe.of(next(n - 1));
+        }
+      }, 100000);
+      console.log('a',a);
+      assert.equal(true, Maybe.of('DONE').equals(a));
+    });
+
+    it('responds to failure immediately', function() {
+      assert.equal(true, Maybe.Nothing().equals(Maybe.chainRec(function(/*next, done, n*/) {
+        return Maybe.Nothing();
+      }, 100)));
+    });
+
+    it('responds to failure on next step', function() {
+      return Maybe.Nothing().equals(Maybe.chainRec(function(next, done, n) {
+        if (n === 0) {
+          return Maybe.Nothing();
+        }
+        return Maybe.of(next(n - 1));
+      }, 100));
+    });
+  });
+
   it('is a Monad', function() {
     var mTest = types.monad;
 

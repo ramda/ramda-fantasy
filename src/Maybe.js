@@ -80,6 +80,20 @@ Just.prototype.chain = util.baseMap;
 Nothing.prototype.chain = util.returnThis;
 
 
+//chainRec
+Maybe.chainRec = Maybe.prototype.chainRec = function(f, i) {
+  var res, state = util.chainRecNext(i);
+  while (state.isNext) {
+    res = f(util.chainRecNext, util.chainRecDone, state.value);
+    if (Maybe.isNothing(res)) {
+      return res;
+    }
+    state = res.value;
+  }
+  return Maybe.Just(state.value);
+};
+
+
 //
 Just.prototype.datatype = Just;
 

@@ -38,6 +38,14 @@ module.exports = {
 
   returnThis: function() { return this; },
 
+  chainRecNext: function(v) {
+    return { isNext: true, value: v };
+  },
+
+  chainRecDone: function(v) {
+    return { isNext: false, value: v };
+  },
+
   deriveAp: function (Type) {
     return function(fa) {
       return this.chain(function (f) {

@@ -49,6 +49,48 @@ describe('Either', function() {
     jsv.assert(jsv.forall(eNatArb, fnEArb, fnEArb, cTest.associative));
   });
 
+  describe('ChainRec', function() {
+    it('is a ChainRec', function() {
+      var cTest = types.chainRec;
+      var predicate = function(a) {
+        return a.length > 5;
+      };
+      var done = Either.of;
+      var x = 1;
+      var initial = [x];
+      var next = function(a) {
+        return Either.of(a.concat([x]));
+      };
+      assert.equal(true, cTest.iface(Either.of(1)));
+      assert.equal(true, cTest.equivalence(Either, predicate, done, next, initial));
+    });
+
+    it('is stacksafe', function() {
+      assert.equal(true, Either.of('DONE').equals(Either.chainRec(function(next, done, n) {
+        if (n === 0) {
+          return Either.of(done('DONE'));
+        } else {
+          return Either.of(next(n - 1));
+        }
+      }, 100000)));
+    });
+
+    it('responds to failure immediately', function() {
+      assert.equal(true, Either.Left("ERROR").equals(Either.chainRec(function(/*next, done, n*/) {
+        return Either.Left("ERROR");
+      }, 100)));
+    });
+
+    it('responds to failure on next step', function() {
+      assert.equal(true, Either.Left("ERROR").equals(Either.chainRec(function(next, done, n) {
+        if (n === 0) {
+          return Either.Left("ERROR");
+        }
+        return Either.of(next(n - 1));
+      }, 100)));
+    });
+  });
+
   it('is a Monad', function() {
     jsv.assert(jsv.forall(eNatArb, types.monad.iface));
   });

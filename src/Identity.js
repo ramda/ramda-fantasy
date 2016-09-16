@@ -68,6 +68,15 @@ Identity.prototype.chain = function(fn) {
   return fn(this.value);
 };
 
+// chainRec
+Identity.chainRec = Identity.prototype.chainRec = function(f, i) {
+  var state = util.chainRecNext(i);
+  while (state.isNext) {
+    state = f(util.chainRecNext, util.chainRecDone, state.value).get();
+  }
+  return Identity(state.value);
+};
+
 /**
  * Returns the value of `Identity[a]`
  *
