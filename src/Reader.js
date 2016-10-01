@@ -1,4 +1,7 @@
-var R = require('ramda');
+var compose = require('ramda/src/compose');
+var identity = require('ramda/src/identity');
+var toString = require('ramda/src/toString');
+var always = require('ramda/src/always');
 
 
 function Reader(run) {
@@ -40,10 +43,10 @@ Reader.prototype.of = function(a) {
 };
 Reader.of = Reader.prototype.of;
 
-Reader.ask = Reader(R.identity);
+Reader.ask = Reader(identity);
 
 Reader.prototype.toString = function() {
-  return 'Reader(' + R.toString(this.run) + ')';
+  return 'Reader(' + toString(this.run) + ')';
 };
 
 Reader.T = function(M) {
@@ -54,7 +57,7 @@ Reader.T = function(M) {
     this.run = run;
   };
 
-  ReaderT.lift = R.compose(ReaderT, R.always);
+  ReaderT.lift = compose(ReaderT, always);
 
   ReaderT.ask = ReaderT(M.of);
 
@@ -87,14 +90,8 @@ Reader.T = function(M) {
     });
   };
 
-  ReaderT.prototype.equals = function(that) {
-    return this === that ||
-      this.run === that.run ||
-      R.equals(this.run().get(), that.run().get());
-  };
-
   ReaderT.prototype.toString = function() {
-    return 'ReaderT[' + M.name + '](' + R.toString(this.run) + ')';
+    return 'ReaderT[' + M.name + '](' + toString(this.run) + ')';
   };
 
   return ReaderT;

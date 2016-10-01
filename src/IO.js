@@ -1,8 +1,9 @@
-var R = require('ramda');
+var compose = require('ramda/src/compose');
+var toString = require('ramda/src/toString');
+
+var util = require('./internal/util');
 
 module.exports = IO;
-
-var compose = R.compose;
 
 function IO(fn) {
   if (!(this instanceof IO)) {
@@ -19,6 +20,17 @@ IO.prototype.chain = function(f) {
   return new IO(function() {
     var next = f(io.fn.apply(io, arguments));
     return next.fn.apply(next, arguments);
+  });
+};
+
+//chainRec
+IO.chainRec = IO.prototype.chainRec = function(f, i) {
+  return new IO(function() {
+    var state = util.chainRecNext(i);
+    while (state.isNext) {
+      state = f(util.chainRecNext, util.chainRecDone, state.value).fn();
+    }
+    return state.value;
   });
 };
 
@@ -50,5 +62,5 @@ IO.prototype.of = function(x) {
 IO.of = IO.prototype.of;
 
 IO.prototype.toString = function() {
-  return 'IO(' + R.toString(this.fn) + ')';
+  return 'IO(' + toString(this.fn) + ')';
 };

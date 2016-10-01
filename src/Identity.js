@@ -1,4 +1,4 @@
-var R = require('ramda');
+var toString = require('ramda/src/toString');
 
 var util = require('./internal/util');
 
@@ -68,6 +68,15 @@ Identity.prototype.chain = function(fn) {
   return fn(this.value);
 };
 
+// chainRec
+Identity.chainRec = Identity.prototype.chainRec = function(f, i) {
+  var state = util.chainRecNext(i);
+  while (state.isNext) {
+    state = f(util.chainRecNext, util.chainRecDone, state.value).get();
+  }
+  return Identity(state.value);
+};
+
 /**
  * Returns the value of `Identity[a]`
  *
@@ -82,7 +91,7 @@ Identity.prototype.get = function() {
 Identity.prototype.equals = util.getEquals(Identity);
 
 Identity.prototype.toString = function() {
-  return 'Identity(' + R.toString(this.value) + ')';
+  return 'Identity(' + toString(this.value) + ')';
 };
 
 module.exports = Identity;

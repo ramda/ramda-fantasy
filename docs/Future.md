@@ -1,7 +1,7 @@
 # Future
 
 The `Future` type is used to represent some future, often asynchronous,
-action that may potentially fail. It is similar to native the JS `Promise` type,
+action that may potentially fail. It is similar to the native JS `Promise` type,
 however the computation of a `Promise` is executed immediately, while the
 execution of a `Future` instance is delayed until explicitly requested.
 
@@ -125,7 +125,7 @@ the returned `Future` instance will be rejected with that value.
 ```hs
 :: Future e a ~> (e -> Future e b) -> Future e b
 ```
-If this `Future` instance is rejected, the provided function is be called with
+If this `Future` instance is rejected, the provided function will be called with
 the rejected value, where a new `Future` instance must be returned. This can
 be used to recover from a rejected `Future` instance. If this `Future` instance
 is resolved, the provided function will be ignored.

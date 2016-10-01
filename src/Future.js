@@ -1,4 +1,9 @@
-var R = require('ramda');
+var once = require('ramda/src/once');
+var forEach = require('ramda/src/forEach');
+var toString = require('ramda/src/toString');
+var curry = require('ramda/src/curry');
+
+var util = require('./internal/util');
 
 function jail(handler, f){
   return function(a){
@@ -35,7 +40,7 @@ Future.prototype.ap = function(m) {
 
   return new Future(function(rej, res) {
     var applyFn, val;
-    var doReject = R.once(rej);
+    var doReject = once(rej);
 
     var resolveIfDone = jail(doReject, function() {
       if (applyFn != null && val != null) {
@@ -79,6 +84,51 @@ Future.prototype.chain = function(f) {  // Sorella's:
   }.bind(this));
 };
 
+// chainRec
+//
+// Heavily influenced by the Aff MonadRec instance
+// https://github.com/slamdata/purescript-aff/blob/51106474122d0e5aec8e3d5da5bb66cfe8062f55/src/Control/Monad/Aff.js#L263-L322
+Future.chainRec = Future.prototype.chainRec = function(f, a) {
+  return Future(function(reject, resolve) {
+    return function go(acc) {
+      // isSync could be in three possable states
+      // * null - unresolved status
+      // * true - synchronous future
+      // * false - asynchronous future
+      var isSync = null;
+      var state = util.chainRecNext(acc);
+      var onResolve = function(v) {
+        // If the `isSync` is still unresolved, we have observed a
+        // synchronous future. Otherwise, `isSync` will be `false`.
+        if (isSync === null) {
+          isSync = true;
+          // Store the result for further synchronous processing.
+          state = v;
+        } else {
+          // When we have observed an asynchronous future, we use normal
+          // recursion. This is safe because we will be on a new stack.
+          (v.isNext ? go : resolve)(v.value);
+        }
+      };
+      while (state.isNext) {
+        isSync = null;
+        f(util.chainRecNext, util.chainRecDone, state.value).fork(reject, onResolve);
+        // If the `isSync` has already resolved to `true` by our `onResolve`, then
+        // we have observed a synchronous future. Otherwise it will still be `null`.
+        if (isSync === true) {
+          continue;
+        } else {
+          // If the status has not resolved yet, then we have observed an
+          // asynchronous or failed future so update status and exit the loop.
+          isSync = false;
+          return;
+        }
+      }
+      resolve(state.value);
+    }(a);
+  });
+};
+
 // chainReject
 // Like chain but operates on the reject instead of the resolve case.
 //:: Future a, b => (a -> Future c) -> Future c
@@ -112,7 +162,7 @@ Future.reject = function(val) {
 };
 
 Future.prototype.toString = function() {
-  return 'Future(' + R.toString(this._fork) + ')';
+  return 'Future(' + toString(this._fork) + ')';
 };
 
 Future.cache = function(f) {
@@ -120,11 +170,11 @@ Future.cache = function(f) {
   var listeners = [];
   var cachedValue;
 
-  var handleCompletion = R.curry(function(newStatus, cb, val) {
+  var handleCompletion = curry(function(newStatus, cb, val) {
     status = newStatus;
     cachedValue = val;
     cb(val);
-    R.forEach(function(listener) {
+    forEach(function(listener) {
       listener[status](cachedValue);
     }, listeners);
   });

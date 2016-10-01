@@ -1,4 +1,4 @@
-var _equals = require('ramda').equals;
+var _equals = require('ramda/src/equals');
 
 
 module.exports = {
@@ -36,6 +36,32 @@ module.exports = {
     };
   },
 
-  returnThis: function() { return this; }
+  returnThis: function() { return this; },
+
+  chainRecNext: function(v) {
+    return { isNext: true, value: v };
+  },
+
+  chainRecDone: function(v) {
+    return { isNext: false, value: v };
+  },
+
+  deriveAp: function (Type) {
+    return function(fa) {
+      return this.chain(function (f) {
+        return fa.chain(function (a) {
+          return Type.of(f(a));
+        });
+      });
+    };
+  },
+
+  deriveMap: function (Type) {
+    return function (f) {
+      return this.chain(function (a) {
+        return Type.of(f(a));
+      });
+    };
+  }
 
 };

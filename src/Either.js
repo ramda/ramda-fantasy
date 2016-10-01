@@ -1,4 +1,5 @@
-var R = require('ramda');
+var curry = require('ramda/src/curry');
+var toString = require('ramda/src/toString');
 
 var util = require('./internal/util');
 
@@ -29,7 +30,7 @@ Either.prototype.chain = util.returnThis; // throw?
 
 Either.equals = Either.prototype.equals = util.getEquals(Either);
 
-Either.either = R.curry(function either(leftFn, rightFn, e) {
+Either.either = curry(function either(leftFn, rightFn, e) {
   if (e instanceof _Left) {
     return leftFn(e.value);
   } else if (e instanceof _Right) {
@@ -69,6 +70,19 @@ _Right.prototype.chain = function(f) {
   return f(this.value);
 };
 
+//chainRec
+Either.chainRec = Either.prototype.chainRec = function(f, i) {
+  var res, state = util.chainRecNext(i);
+  while (state.isNext) {
+    res = f(util.chainRecNext, util.chainRecDone, state.value);
+    if (Either.isLeft(res)) {
+      return res;
+    }
+    state = res.value;
+  }
+  return Either.Right(state.value);
+};
+
 _Right.prototype.bimap = function(_, f) {
   return new _Right(f(this.value));
 };
@@ -78,7 +92,7 @@ _Right.prototype.extend = function(f) {
 };
 
 _Right.prototype.toString = function() {
-  return 'Either.Right(' + R.toString(this.value) + ')';
+  return 'Either.Right(' + toString(this.value) + ')';
 };
 
 Either.Right = function(value) {
@@ -104,7 +118,7 @@ _Left.prototype.bimap = function(f) {
 _Left.prototype.extend = util.returnThis;
 
 _Left.prototype.toString = function() {
-  return 'Either.Left(' + R.toString(this.value) + ')';
+  return 'Either.Left(' + toString(this.value) + ')';
 };
 
 Either.Left = function(value) {

@@ -57,6 +57,33 @@ describe('Identity', function() {
     assert.equal(true, cTest.associative(m, fNull, fNull));
   });
 
+  describe('ChainRec', function() {
+    it('is a ChainRec', function() {
+      var cTest = types.chainRec;
+      var predicate = function(a) {
+        return a.length > 5;
+      };
+      var done = Identity.of;
+      var x = 1;
+      var initial = [x];
+      var next = function(a) {
+        return Identity.of(a.concat([x]));
+      };
+      assert.equal(true, cTest.iface(Identity.of(1)));
+      assert.equal(true, cTest.equivalence(Identity, predicate, done, next, initial));
+    });
+
+    it('is stacksafe', function() {
+      assert.equal(true, Identity.of('DONE').equals(Identity.chainRec(function(next, done, n) {
+        if (n === 0) {
+          return Identity.of(done('DONE'));
+        } else {
+          return Identity.of(next(n - 1));
+        }
+      }, 100000)));
+    });
+  });
+
   it('is a Monad', function() {
     var mTest = types.monad;
     assert.equal(true, mTest.iface(m));

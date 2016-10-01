@@ -13,7 +13,7 @@
   ],
   "name": "ramda-fantasy",
   "description": "Fantasy Land compatible types for easy integration with Ramda",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "homepage": "https://www.github.com/ramda/ramda-fantasy",
   "license": "MIT",
   "repository": {
@@ -30,13 +30,14 @@
     "test": "mocha"
   },
   "dependencies": {
-    "ramda": ">=0.15.0 <=0.21.x"
+    "ramda": ">=0.15.0"
   },
   "devDependencies": {
     "jscs": "1.13.x",
     "jshint": "~2.7.0",
     "jsverify": "^0.7.1",
     "mocha": "^2.1.0",
+    "promise": "7.1.1",
     "uglify-js": "2.4.x",
     "xyz": "0.5.x"
   }
