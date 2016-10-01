@@ -21,6 +21,8 @@
     "url": "git://github.com/ramda/ramda-fantasy.git"
   },
   "scripts": {
+    "build": "browserify -r ./index.js -s RF | derequire > dist/ramda-fantasy.js ",
+    "postbuild": "uglifyjs dist/ramda-fantasy.js -m -c unused=false -o dist/ramda-fantasy.min.js",
     "jscs": "node_modules/.bin/jscs src/* test/*",
     "jshint": "node_modules/.bin/jshint src/* test/*",
     "pretest": "npm run jshint",
@@ -33,6 +35,8 @@
     "ramda": ">=0.15.0"
   },
   "devDependencies": {
+    "browserify": "13.1.x",
+    "derequire": "^2.0.3",
     "jscs": "1.13.x",
     "jshint": "~2.7.0",
     "jsverify": "^0.7.1",
