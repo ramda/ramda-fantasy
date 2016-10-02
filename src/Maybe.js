@@ -51,6 +51,15 @@ Maybe.maybe = curry(function(nothingVal, justFn, m) {
   }, nothingVal);
 });
 
+// semigroup
+Just.prototype.concat = function(that) {
+  return that.isNothing ? this : this.of(
+    this.value.concat(that.value)
+  );
+};
+
+Nothing.prototype.concat = util.identity;
+
 // functor
 Just.prototype.map = function(f) {
   return this.of(f(this.value));
