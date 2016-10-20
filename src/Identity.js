@@ -1,5 +1,5 @@
 var toString = require('ramda/src/toString');
-
+var Z = require('sanctuary-type-classes');
 var util = require('./internal/util');
 
 
@@ -52,7 +52,7 @@ Identity.prototype.map = function(f) {
  * @sig (Identity[a -> b], f: Applicative[_]) => f[a] -> f[b]
  */
 Identity.prototype.ap = function(app) {
-  return app.map(this.value);
+  return Z.map(this.value, app);
 };
 
 /**
@@ -93,5 +93,7 @@ Identity.prototype.equals = util.getEquals(Identity);
 Identity.prototype.toString = function() {
   return 'Identity(' + toString(this.value) + ')';
 };
+
+require('./internal/fl-patch.js')([Identity, Identity.prototype]);
 
 module.exports = Identity;

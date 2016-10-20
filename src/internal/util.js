@@ -1,5 +1,5 @@
 var _equals = require('ramda/src/equals');
-
+var Z = require('sanctuary-type-classes');
 
 module.exports = {
 
@@ -48,19 +48,19 @@ module.exports = {
 
   deriveAp: function (Type) {
     return function(fa) {
-      return this.chain(function (f) {
-        return fa.chain(function (a) {
-          return Type.of(f(a));
-        });
-      });
+      return Z.chain(function (f) {
+        return Z.chain(function (a) {
+          return Z.of(Type, f(a));
+        }, fa);
+      }, this);
     };
   },
 
   deriveMap: function (Type) {
     return function (f) {
-      return this.chain(function (a) {
-        return Type.of(f(a));
-      });
+      return Z.chain(function (a) {
+        return Z.of(Type, f(a));
+      }, this);
     };
   }
 

@@ -203,4 +203,6 @@ Future.cache = function(f) {
   });
 };
 
+require('./internal/fl-patch.js')([Future, Future.prototype]);
+
 module.exports = Future;

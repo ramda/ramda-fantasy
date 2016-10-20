@@ -1,9 +1,10 @@
 var curry = require('ramda/src/curry');
+var Z = require('sanctuary-type-classes');
 
 var Identity = require('./Identity');
 var Tuple = require('./Tuple');
 var util = require('./internal/util');
-
+var patchAll = require('./internal/fl-patch.js');
 
 function T(M) {
   function StateT(run) {
@@ -24,14 +25,14 @@ function T(M) {
   StateT.prototype.chain = function(f) {
     var state = this;
     return StateT(function(s) {
-      return state._run(s).chain(function(t) {
+      return Z.chain(function(t) {
         return f(Tuple.fst(t))._run(Tuple.snd(t));
-      });
+      }, state._run(s));
     });
   };
   StateT.of = StateT.prototype.of = function(a) {
     return StateT(function (s) {
-      return M.of(Tuple(a, s));
+      return Z.of(M,Tuple(a, s));
     });
   };
   StateT.prototype.ap = util.deriveAp(StateT);
@@ -39,40 +40,43 @@ function T(M) {
   StateT.tailRec = curry(function(stepFn, init) {
     return StateT(function(s) {
       return M.tailRec(function(t) {
-        return stepFn(Tuple.fst(t))._run(Tuple.snd(t)).chain(function (t_) {
-          return M.of(Tuple.fst(t_).bimap(
+        return Z.chain(function (t_) {
+          return Z.of(M,Z.bimap(
             function(a) { return Tuple(a, Tuple.snd(t_)); },
-            function(b) { return Tuple(b, Tuple.snd(t_)); }
+            function(b) { return Tuple(b, Tuple.snd(t_)); },
+            Tuple.fst(t_)
           ));
-        });
+        }, stepFn(Tuple.fst(t))._run(Tuple.snd(t)));
       }, Tuple(init, s));
     });
   });
   StateT.lift = function(ma) {
     return StateT(function(s) {
-      return ma.chain(function(a) {
-        return M.of(Tuple(a, s));
+      return Z.chain(ma, function(a) {
+        return Z.of(M, Tuple(a, s));
       });
     });
   };
   StateT.get = StateT(function(s) {
-    return M.of(Tuple(s, s));
+    return Z.of(M, Tuple(s, s));
   });
   StateT.gets = function(f) {
     return StateT(function(s) {
-      return M.of(Tuple(f(s), s));
+      return Z.of(M, Tuple(f(s), s));
     });
   };
   StateT.put = function(s) {
     return StateT(function(_) {
-      return M.of(Tuple(void _, s));
+      return Z.of(M, Tuple(void _, s));
     });
   };
   StateT.modify = function(f) {
     return StateT(function(s) {
-      return M.of(Tuple(void 0, f(s)));
+      return Z.of(M, Tuple(void 0, f(s)));
     });
   };
+
+  patchAll([StateT, StateT.prototype]);
 
   return StateT;
 }
@@ -82,5 +86,7 @@ State.T = T;
 State.prototype.run = function(s) {
   return this._run(s).value;
 };
+
+patchAll([State, State.prototype]);
 
 module.exports = State;

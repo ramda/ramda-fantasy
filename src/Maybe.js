@@ -1,5 +1,6 @@
 var toString = require('ramda/src/toString');
 var curry = require('ramda/src/curry');
+var Z = require('sanctuary-type-classes');
 
 var util = require('./internal/util.js');
 
@@ -46,15 +47,15 @@ Maybe.isNothing = function(x) {
 };
 
 Maybe.maybe = curry(function(nothingVal, justFn, m) {
-  return m.reduce(function(_, x) {
+  return Z.reduce(function(_, x) {
     return justFn(x);
-  }, nothingVal);
+  }, nothingVal, m);
 });
 
 // semigroup
 Just.prototype.concat = function(that) {
   return that.isNothing ? this : this.of(
-    this.value.concat(that.value)
+    Z.concat(this.value, that.value)
   );
 };
 
@@ -62,7 +63,7 @@ Nothing.prototype.concat = util.identity;
 
 // functor
 Just.prototype.map = function(f) {
-  return this.of(f(this.value));
+  return Z.of(this, f(this.value));
 };
 
 Nothing.prototype.map = util.returnThis;
@@ -71,7 +72,7 @@ Nothing.prototype.map = util.returnThis;
 // takes a Maybe that wraps a function (`app`) and applies its `map`
 // method to this Maybe's value, which must be a function.
 Just.prototype.ap = function(m) {
-  return m.map(this.value);
+  return Z.map(this.value, m);
 };
 
 Nothing.prototype.ap = util.returnThis;
@@ -150,5 +151,11 @@ Just.prototype.toString = function() {
 Nothing.prototype.toString = function() {
   return 'Maybe.Nothing()';
 };
+
+require('./internal/fl-patch.js')([
+  Maybe, Maybe.prototype,
+  Nothing, Nothing.prototype,
+  Just, Just.prototype,
+]);
 
 module.exports = Maybe;
