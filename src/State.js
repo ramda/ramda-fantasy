@@ -41,7 +41,7 @@ function T(M) {
     return StateT(function(s) {
       return M.tailRec(function(t) {
         return Z.chain(function (t_) {
-          return Z.of(M,Z.bimap(
+          return Z.of(M, Z.bimap(
             function(a) { return Tuple(a, Tuple.snd(t_)); },
             function(b) { return Tuple(b, Tuple.snd(t_)); },
             Tuple.fst(t_)
