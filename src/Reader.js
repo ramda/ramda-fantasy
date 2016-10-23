@@ -4,7 +4,7 @@ var toString = require('ramda/src/toString');
 var always = require('ramda/src/always');
 var Z = require('sanctuary-type-classes');
 
-var patchAll = require('./internal/fl-patch.js');
+var patchAll = require('./internal/fl-patch');
 
 function Reader(run) {
   if (!(this instanceof Reader)) {

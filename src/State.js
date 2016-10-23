@@ -4,7 +4,7 @@ var Z = require('sanctuary-type-classes');
 var Identity = require('./Identity');
 var Tuple = require('./Tuple');
 var util = require('./internal/util');
-var patchAll = require('./internal/fl-patch.js');
+var patchAll = require('./internal/fl-patch');
 
 function T(M) {
   function StateT(run) {

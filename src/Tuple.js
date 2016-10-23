@@ -56,7 +56,7 @@ _Tuple.prototype.toString = function() {
   return 'Tuple(' + toString(this[0]) + ', ' + toString(this[1]) + ')';
 };
 
-require('./internal/fl-patch.js')([_Tuple, _Tuple.prototype]);
+require('./internal/fl-patch')([_Tuple, _Tuple.prototype]);
 
 
 module.exports = Tuple;

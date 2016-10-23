@@ -94,6 +94,6 @@ Identity.prototype.toString = function() {
   return 'Identity(' + toString(this.value) + ')';
 };
 
-require('./internal/fl-patch.js')([Identity, Identity.prototype]);
+require('./internal/fl-patch')([Identity, Identity.prototype]);
 
 module.exports = Identity;

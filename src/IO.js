@@ -66,4 +66,4 @@ IO.prototype.toString = function() {
   return 'IO(' + toString(this.fn) + ')';
 };
 
-require('./internal/fl-patch.js')([IO, IO.prototype]);
+require('./internal/fl-patch')([IO, IO.prototype]);

@@ -152,7 +152,7 @@ Nothing.prototype.toString = function() {
   return 'Maybe.Nothing()';
 };
 
-require('./internal/fl-patch.js')([
+require('./internal/fl-patch')([
   Maybe, Maybe.prototype,
   Nothing, Nothing.prototype,
   Just, Just.prototype,

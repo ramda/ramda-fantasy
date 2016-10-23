@@ -125,7 +125,7 @@ Either.Left = function(value) {
   return new _Left(value);
 };
 
-require('./internal/fl-patch.js')([
+require('./internal/fl-patch')([
   Either, Either.prototype,
   _Left, _Left.prototype,
   _Right, _Right.prototype,
