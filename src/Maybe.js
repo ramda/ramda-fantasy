@@ -1,5 +1,7 @@
 var toString = require('ramda/src/toString');
 var curry = require('ramda/src/curry');
+var isNil = require('ramda/src/isNil');
+var ifElse = require('ramda/src/ifElse');
 
 var util = require('./internal/util.js');
 
@@ -36,6 +38,8 @@ Maybe.Just = function(x) {
 Maybe.of = Maybe.Just;
 
 Maybe.prototype.of = Maybe.Just;
+
+Maybe.ofNullable = ifElse(isNil, Maybe.Nothing, Maybe.Just);
 
 Maybe.isJust = function(x) {
   return x.isJust;

@@ -222,4 +222,20 @@ describe('Maybe usage', function() {
       }));
     });
   });
+
+  describe('#ofNullable', function() {
+
+    it('returns Nothing for null', function() {
+      assert.equal(Maybe.ofNullable(null).isNothing, true);
+    });
+    it('returns Nothing for undefined', function() {
+      assert.equal(Maybe.ofNullable(undefined).isNothing, true);
+    });
+    it('returns Just(x) for an arbitrary value x', function() {
+      var just1 = Maybe.ofNullable(1);
+      assert.equal(just1.isJust, true);
+      assert.equal(just1.getOrElse(42), 1);
+    });
+  });
+
 });
