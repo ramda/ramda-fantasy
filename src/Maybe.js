@@ -39,7 +39,7 @@ Maybe.of = Maybe.Just;
 
 Maybe.prototype.of = Maybe.Just;
 
-Maybe.ofNullable = ifElse(isNil, Maybe.Nothing, Maybe.Just);
+Maybe.toMaybe = ifElse(isNil, Maybe.Nothing, Maybe.Just);
 
 Maybe.isJust = function(x) {
   return x.isJust;
