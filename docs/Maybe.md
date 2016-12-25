@@ -49,14 +49,18 @@ somewhat similar in that neither can transform a `Nothing` into a `Just`, though
 within a `Just`.
 
 ```js
+const { curry } = require('ramda')
+
 // map :: Maybe a ~> (a -> b) -> Maybe b
 safeDiv(42, 2).map(R.inc); // Maybe(22)
 safeDiv(42, 0).map(R.inc); // Nothing
 
+const curriedLookup = curry(lookup)
+
 // chain :: Maybe a ~> (a -> Maybe b) -> Maybe b
-lookup('a', { a: { b: 'foo' }}).chain(lookup('b')); // Just('foo')
-lookup('a', { a: {}}).chain(lookup('b'));           // Nothing
-lookup('a', {}).chain(lookup('b'));                 // Nothing
+lookup('a', { a: { b: 'foo' }}).chain(curriedLookup('b')); // Just('foo')
+lookup('a', { a: {}}).chain(curriedLookup('b'));           // Nothing
+lookup('a', {}).chain(curriedLookup('b'));                 // Nothing
 ```
 
 ## Reference
