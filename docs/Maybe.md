@@ -17,8 +17,8 @@ const M       = require('ramda-fantasy').Maybe;
 const Just    = M.Just;
 const Nothing = M.Nothing;
 
-const safeDiv = R.curry((n, d) => d === 0 ? Nothing() : Just(n / d));
-const lookup = R.curry((k, obj) => k in obj ? Just(obj[k]) : Nothing());
+const safeDiv = (n, d) => d === 0 ? Nothing() : Just(n / d);
+const lookup = (k, obj) => k in obj ? Just(obj[k]) : Nothing();
 ```
 
 ## Interaction
