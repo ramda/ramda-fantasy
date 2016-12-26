@@ -141,7 +141,7 @@ returned.
 
 #### `maybe.reduce`
 ```hs
-:: Maybe a ~> (b -> a -> b) -> b -> b
+:: Maybe a ~> ((b, a) -> b, b) -> b
 ```
 Returns the result of applying the provided function to the initial value and
 the value of the `Just`. If the instance is a `Nothing`, then the initial value
