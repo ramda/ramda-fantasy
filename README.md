@@ -19,6 +19,7 @@ not undergone thorough testing/use yet.
 | [Maybe][13]     |    **✔︎**     |     **✔︎**      |     **✔︎**    |      **✔︎**       |   **✔︎**    |     **✔︎**     |     **✔︎**      |
 | [Reader][14]    |              |                |     **✔︎**    |      **✔︎**       |   **✔︎**    |               |                |
 | [Tuple][15]     |    **✔︎**     |     **✔︎**      |     **✔︎**    |                  |            |               |                |
+| [State][17]     |               |               |       **✔︎**   |    **✔︎**        |   **✔︎**    |               |       **✔︎**        |
 
 
 Access like so:
@@ -42,3 +43,4 @@ Access like so:
 [14]: docs/Reader.md
 [15]: docs/Tuple.md
 [16]: https://github.com/fantasyland/fantasy-land#chainrec
+[17]: docs/State.md
