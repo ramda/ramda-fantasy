@@ -26,6 +26,8 @@ Access like so:
 ```
   var Either = require('ramda-fantasy').Either;
 ```
+## available translations
+[Spanish](https://github.com/idcmardelplata/ramda-fantasy)
 
 [1]: https://github.com/fantasyland/fantasy-land
 [2]: https://github.com/ramda/ramda
