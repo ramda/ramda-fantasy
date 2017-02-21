@@ -175,4 +175,28 @@ describe('Either', function() {
 
   });
 
+  describe('#equals', function() {
+
+    it('returns true if both contain equal values and are both Left', function() {
+      assert.equal(true, Either.Left(1).equals(Either.Left(1)));
+    });
+
+    it('returns true if both contain equal values and are both Right', function() {
+      assert.equal(true, Either.Right(1).equals(Either.Right(1)));
+    });
+
+    it('returns false if both contain equal values but are of different constructors', function() {
+      assert.equal(false, Either.Left(1).equals(Either.Right(1)));
+    });
+
+    it('returns false if both contain different values and are both Left', function() {
+      assert.equal(false, Either.Left(0).equals(Either.Left(1)));
+    });
+
+    it('returns false if both contain different values and are both Right', function() {
+      assert.equal(false, Either.Right(0).equals(Either.Right(1)));
+    });
+
+  });
+
 });

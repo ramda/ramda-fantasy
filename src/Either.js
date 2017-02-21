@@ -27,9 +27,6 @@ Either.of = Either.prototype.of = function(value) {
 
 Either.prototype.chain = util.returnThis; // throw?
 
-
-Either.equals = Either.prototype.equals = util.getEquals(Either);
-
 Either.either = curry(function either(leftFn, rightFn, e) {
   if (e instanceof _Left) {
     return leftFn(e.value);
@@ -95,6 +92,8 @@ _Right.prototype.toString = function() {
   return 'Either.Right(' + toString(this.value) + ')';
 };
 
+_Right.prototype.equals = util.getEquals(_Right);
+
 Either.Right = function(value) {
   return new _Right(value);
 };
@@ -120,6 +119,8 @@ _Left.prototype.extend = util.returnThis;
 _Left.prototype.toString = function() {
   return 'Either.Left(' + toString(this.value) + ')';
 };
+
+_Left.prototype.equals = util.getEquals(_Left);
 
 Either.Left = function(value) {
   return new _Left(value);
