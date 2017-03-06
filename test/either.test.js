@@ -199,4 +199,20 @@ describe('Either', function() {
 
   });
 
+
+
+  describe('#either', function() {
+    it('returns the value of a Left after applying the first function arg', function() {
+      jsv.assert(jsv.forall(leftArb(jsv.nat), fnNatArb, fnNatArb, function(e, f, g) {
+        return e.either(f, g) === f(e.value);
+      }));
+    });
+
+    it('returns the value of a Right after applying the second function arg', function() {
+      jsv.assert(jsv.forall(rightArb(jsv.nat), fnNatArb, fnNatArb, function(e, f, g) {
+        return e.either(f, g) === g(e.value);
+      }));
+    });
+  });
+
 });

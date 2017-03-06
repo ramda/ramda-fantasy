@@ -127,4 +127,9 @@ Either.Left = function(value) {
 };
 
 
+// either
+Either.prototype.either = function instanceEither(leftFn, rightFn) {
+  return this.isLeft ? leftFn(this.value) : rightFn(this.value);
+};
+
 module.exports = Either;
