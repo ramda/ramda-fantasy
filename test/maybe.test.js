@@ -222,4 +222,13 @@ describe('Maybe usage', function() {
       }));
     });
   });
+
+  describe("Nothing", function() {
+    var n = Maybe.Nothing();
+    n.x = 1;
+    assert.strictEqual(n.x, undefined);
+    assert.strictEqual("x" in n, false);
+    assert.strictEqual(Maybe.Nothing().x, undefined);
+    assert.strictEqual("x" in Maybe.Nothing(), false);
+  });
 });

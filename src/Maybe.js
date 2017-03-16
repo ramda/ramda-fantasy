@@ -23,7 +23,7 @@ util.extend(Nothing, Maybe);
 Nothing.prototype.isNothing = true;
 Nothing.prototype.isJust = false;
 
-var _nothing = new Nothing();
+var _nothing = Object.freeze(new Nothing());
 
 Maybe.Nothing = function() {
   return _nothing;
