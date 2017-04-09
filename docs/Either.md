@@ -140,3 +140,10 @@ are of the same constructor and both contain equal values.
 :: Either a b ~> () -> String
 ```
 Returns a string representation of the `Either` instance.
+
+#### `either.either`
+```hs
+:: Either a b ~> (a -> c) -> (b -> c) -> c
+```
+Used to extract the value out of the `Either` by providing a function to handle
+the types of values contained in both `Left` and `Right`.
