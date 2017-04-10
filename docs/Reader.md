@@ -124,7 +124,7 @@ A static `Reader` instance that just returns its environment.
 
 #### `ReaderT.ask`
 ```hs
-:: Monad m => Reader r m a
+:: Monad m => ReaderT r m a
 ```
 A static `ReaderT` instance that just returns its environment.
 
@@ -138,13 +138,13 @@ Produces a pure `Reader` instance for the given value.
 
 #### `ReaderT.of`
 ```hs
-:: Monad m => a -> Reader r m a
+:: Monad m => a -> ReaderT r m a
 ```
 Produces a pure `ReaderT` instance for the given value.
 
 #### `ReaderT.lift`
 ```hs
-:: Monad m => m a -> Reader r m a
+:: Monad m => m a -> ReaderT r m a
 ```
 Lifts a monad value into a `ReaderT` instance.
 
