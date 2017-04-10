@@ -19,6 +19,7 @@ const Nothing = M.Nothing;
 
 const safeDiv = R.curry((n, d) => d === 0 ? Nothing() : Just(n / d));
 const lookup = R.curry((k, obj) => k in obj ? Just(obj[k]) : Nothing());
+const safeOperationWrapper = Maybe.toMaybe(unsafeOperation());
 ```
 
 ## Interaction
@@ -90,6 +91,13 @@ default value if a `Nothing` is received.
 ```
 Produces a pure `Maybe` instance of a given value. Effectively the `Just`
 constructor.
+
+#### `Maybe.toMaybe`
+```hs
+:: a? -> Maybe a
+```
+Produces a `Maybe` instance of a given value. Returns `Nothing` for nil values
+(undefined and null) and `Just(a)` for non-nil values.
 
 #### `Maybe.isJust`
 ```hs
