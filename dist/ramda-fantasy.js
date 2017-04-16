@@ -3,11 +3,15 @@ var _curry1 = _dereq_('./internal/_curry1');
 
 
 /**
- * Returns a function that always returns the given value. Note that for non-primitives the value
- * returned is a reference to the original value.
+ * Returns a function that always returns the given value. Note that for
+ * non-primitives the value returned is a reference to the original value.
+ *
+ * This function is known as `const`, `constant`, or `K` (for K combinator)
+ * in other languages and libraries.
  *
  * @func
  * @memberOf R
+ * @since v0.1.0
  * @category Function
  * @sig a -> (* -> a)
  * @param {*} val The value to wrap in a function
@@ -23,91 +27,64 @@ module.exports = _curry1(function always(val) {
   };
 });
 
-},{"./internal/_curry1":12}],2:[function(_dereq_,module,exports){
+},{"./internal/_curry1":16}],2:[function(_dereq_,module,exports){
+var _arity = _dereq_('./internal/_arity');
 var _curry2 = _dereq_('./internal/_curry2');
 
 
 /**
- * Wraps a function of any arity (including nullary) in a function that accepts exactly `n`
- * parameters. Unlike `nAry`, which passes only `n` arguments to the wrapped function,
- * functions produced by `arity` will pass all provided arguments to the wrapped function.
+ * Creates a function that is bound to a context.
+ * Note: `R.bind` does not provide the additional argument-binding capabilities of
+ * [Function.prototype.bind](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind).
  *
  * @func
  * @memberOf R
- * @sig (Number, (* -> *)) -> (* -> *)
+ * @since v0.6.0
  * @category Function
- * @param {Number} n The desired arity of the returned function.
- * @param {Function} fn The function to wrap.
- * @return {Function} A new function wrapping `fn`. The new function is
- *         guaranteed to be of arity `n`.
- * @deprecated since v0.15.0
- * @example
- *
- *      var takesTwoArgs = function(a, b) {
- *        return [a, b];
- *      };
- *      takesTwoArgs.length; //=> 2
- *      takesTwoArgs(1, 2); //=> [1, 2]
- *
- *      var takesOneArg = R.arity(1, takesTwoArgs);
- *      takesOneArg.length; //=> 1
- *      // All arguments are passed through to the wrapped function
- *      takesOneArg(1, 2); //=> [1, 2]
+ * @category Object
+ * @see R.partial
+ * @sig (* -> *) -> {*} -> (* -> *)
+ * @param {Function} fn The function to bind to context
+ * @param {Object} thisObj The context to bind `fn` to
+ * @return {Function} A function that will execute in the context of `thisObj`.
  */
-module.exports = _curry2(function(n, fn) {
-  // jshint unused:vars
-  switch (n) {
-    case 0: return function() {return fn.apply(this, arguments);};
-    case 1: return function(a0) {return fn.apply(this, arguments);};
-    case 2: return function(a0, a1) {return fn.apply(this, arguments);};
-    case 3: return function(a0, a1, a2) {return fn.apply(this, arguments);};
-    case 4: return function(a0, a1, a2, a3) {return fn.apply(this, arguments);};
-    case 5: return function(a0, a1, a2, a3, a4) {return fn.apply(this, arguments);};
-    case 6: return function(a0, a1, a2, a3, a4, a5) {return fn.apply(this, arguments);};
-    case 7: return function(a0, a1, a2, a3, a4, a5, a6) {return fn.apply(this, arguments);};
-    case 8: return function(a0, a1, a2, a3, a4, a5, a6, a7) {return fn.apply(this, arguments);};
-    case 9: return function(a0, a1, a2, a3, a4, a5, a6, a7, a8) {return fn.apply(this, arguments);};
-    case 10: return function(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9) {return fn.apply(this, arguments);};
-    default: throw new Error('First argument to arity must be a non-negative integer no greater than ten');
-  }
+module.exports = _curry2(function bind(fn, thisObj) {
+  return _arity(fn.length, function() {
+    return fn.apply(thisObj, arguments);
+  });
 });
 
-},{"./internal/_curry2":13}],3:[function(_dereq_,module,exports){
-var _compose = _dereq_('./internal/_compose');
-var _createComposer = _dereq_('./internal/_createComposer');
+},{"./internal/_arity":11,"./internal/_curry2":17}],3:[function(_dereq_,module,exports){
+var pipe = _dereq_('./pipe');
+var reverse = _dereq_('./reverse');
 
 
 /**
- * Creates a new function that runs each of the functions supplied as parameters in turn,
- * passing the return value of each function invocation to the next function invocation,
- * beginning with whatever arguments were passed to the initial invocation.
- *
- * Note that `compose` is a right-associative function, which means the functions provided
- * will be invoked in order from right to left. In the example `var h = compose(f, g)`,
- * the function `h` is equivalent to `f( g(x) )`, where `x` represents the arguments
- * originally passed to `h`.
+ * Performs right-to-left function composition. The rightmost function may have
+ * any arity; the remaining functions must be unary.
  *
  * @func
  * @memberOf R
+ * @since v0.1.0
  * @category Function
- * @sig ((y -> z), (x -> y), ..., (b -> c), (a... -> b)) -> (a... -> z)
- * @param {...Function} functions A variable number of functions.
- * @return {Function} A new function which represents the result of calling each of the
- *         input `functions`, passing the result of each function call to the next, from
- *         right to left.
+ * @sig ((y -> z), (x -> y), ..., (o -> p), ((a, b, ..., n) -> o)) -> ((a, b, ..., n) -> z)
+ * @param {...Function} functions
+ * @return {Function}
+ * @see R.pipe
  * @example
  *
- *      var triple = function(x) { return x * 3; };
- *      var double = function(x) { return x * 2; };
- *      var square = function(x) { return x * x; };
- *      var squareThenDoubleThenTriple = R.compose(triple, double, square);
+ *      var f = R.compose(R.inc, R.negate, Math.pow);
  *
- *      //≅ triple(double(square(5)))
- *      squareThenDoubleThenTriple(5); //=> 150
+ *      f(3, 4); // -(3^4) + 1
  */
-module.exports = _createComposer(_compose);
+module.exports = function compose() {
+  if (arguments.length === 0) {
+    throw new Error('compose requires at least one argument');
+  }
+  return pipe.apply(this, reverse(arguments));
+};
 
-},{"./internal/_compose":10,"./internal/_createComposer":11}],4:[function(_dereq_,module,exports){
+},{"./pipe":42,"./reverse":45}],4:[function(_dereq_,module,exports){
 var _curry1 = _dereq_('./internal/_curry1');
 var curryN = _dereq_('./curryN');
 
@@ -138,6 +115,7 @@ var curryN = _dereq_('./curryN');
  *
  * @func
  * @memberOf R
+ * @since v0.1.0
  * @category Function
  * @sig (* -> a) -> (* -> a)
  * @param {Function} fn The function to curry.
@@ -145,9 +123,7 @@ var curryN = _dereq_('./curryN');
  * @see R.curryN
  * @example
  *
- *      var addFourNumbers = function(a, b, c, d) {
- *        return a + b + c + d;
- *      };
+ *      var addFourNumbers = (a, b, c, d) => a + b + c + d;
  *
  *      var curriedAddFourNumbers = R.curry(addFourNumbers);
  *      var f = curriedAddFourNumbers(1, 2);
@@ -158,10 +134,11 @@ module.exports = _curry1(function curry(fn) {
   return curryN(fn.length, fn);
 });
 
-},{"./curryN":5,"./internal/_curry1":12}],5:[function(_dereq_,module,exports){
+},{"./curryN":5,"./internal/_curry1":16}],5:[function(_dereq_,module,exports){
+var _arity = _dereq_('./internal/_arity');
+var _curry1 = _dereq_('./internal/_curry1');
 var _curry2 = _dereq_('./internal/_curry2');
 var _curryN = _dereq_('./internal/_curryN');
-var arity = _dereq_('./arity');
 
 
 /**
@@ -190,6 +167,7 @@ var arity = _dereq_('./arity');
  *
  * @func
  * @memberOf R
+ * @since v0.5.0
  * @category Function
  * @sig Number -> (* -> a) -> (* -> a)
  * @param {Number} length The arity for the returned function.
@@ -198,23 +176,23 @@ var arity = _dereq_('./arity');
  * @see R.curry
  * @example
  *
- *      var addFourNumbers = function() {
- *        return R.sum([].slice.call(arguments, 0, 4));
- *      };
+ *      var sumArgs = (...args) => R.sum(args);
  *
- *      var curriedAddFourNumbers = R.curryN(4, addFourNumbers);
+ *      var curriedAddFourNumbers = R.curryN(4, sumArgs);
  *      var f = curriedAddFourNumbers(1, 2);
  *      var g = f(3);
  *      g(4); //=> 10
  */
 module.exports = _curry2(function curryN(length, fn) {
-  return arity(length, _curryN(length, [], fn));
+  if (length === 1) {
+    return _curry1(fn);
+  }
+  return _arity(length, _curryN(length, [], fn));
 });
 
-},{"./arity":2,"./internal/_curry2":13,"./internal/_curryN":14}],6:[function(_dereq_,module,exports){
+},{"./internal/_arity":11,"./internal/_curry1":16,"./internal/_curry2":17,"./internal/_curryN":19}],6:[function(_dereq_,module,exports){
 var _curry2 = _dereq_('./internal/_curry2');
 var _equals = _dereq_('./internal/_equals');
-var _hasMethod = _dereq_('./internal/_hasMethod');
 
 
 /**
@@ -222,8 +200,11 @@ var _hasMethod = _dereq_('./internal/_hasMethod');
  * Dispatches to an `equals` method if present. Handles cyclical data
  * structures.
  *
+ * Dispatches to the `equals` method of both arguments, if present.
+ *
  * @func
  * @memberOf R
+ * @since v0.15.0
  * @category Relation
  * @sig a -> b -> Boolean
  * @param {*} a
@@ -240,14 +221,49 @@ var _hasMethod = _dereq_('./internal/_hasMethod');
  *      R.equals(a, b); //=> true
  */
 module.exports = _curry2(function equals(a, b) {
-  return _hasMethod('equals', a) ? a.equals(b) :
-         _hasMethod('equals', b) ? b.equals(a) : _equals(a, b, [], []);
+  return _equals(a, b, [], []);
 });
 
-},{"./internal/_curry2":13,"./internal/_equals":15,"./internal/_hasMethod":18}],7:[function(_dereq_,module,exports){
+},{"./internal/_curry2":17,"./internal/_equals":21}],7:[function(_dereq_,module,exports){
 var _curry2 = _dereq_('./internal/_curry2');
-var _forEach = _dereq_('./internal/_forEach');
-var _hasMethod = _dereq_('./internal/_hasMethod');
+var _dispatchable = _dereq_('./internal/_dispatchable');
+var _filter = _dereq_('./internal/_filter');
+var _xfilter = _dereq_('./internal/_xfilter');
+
+
+/**
+ * Returns a new list containing only those items that match a given predicate function.
+ * The predicate function is passed one argument: *(value)*.
+ *
+ * Note that `R.filter` does not skip deleted or unassigned indices, unlike the native
+ * `Array.prototype.filter` method. For more details on this behavior, see:
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter#Description
+ *
+ * Dispatches to the `filter` method of the second argument, if present.
+ *
+ * Acts as a transducer if a transformer is given in list position.
+ * @see R.transduce
+ *
+ * @func
+ * @memberOf R
+ * @since v0.1.0
+ * @category List
+ * @sig (a -> Boolean) -> [a] -> [a]
+ * @param {Function} fn The function called per iteration.
+ * @param {Array} list The collection to iterate over.
+ * @return {Array} The new filtered array.
+ * @see R.reject
+ * @example
+ *
+ *      var isEven = n => n % 2 === 0;
+ *
+ *      R.filter(isEven, [1, 2, 3, 4]); //=> [2, 4]
+ */
+module.exports = _curry2(_dispatchable('filter', _xfilter, _filter));
+
+},{"./internal/_curry2":17,"./internal/_dispatchable":20,"./internal/_filter":22,"./internal/_xfilter":37}],8:[function(_dereq_,module,exports){
+var _checkForMethod = _dereq_('./internal/_checkForMethod');
+var _curry2 = _dereq_('./internal/_curry2');
 
 
 /**
@@ -263,8 +279,11 @@ var _hasMethod = _dereq_('./internal/_hasMethod');
  * Also note that, unlike `Array.prototype.forEach`, Ramda's `forEach` returns the original
  * array. In some libraries this function is named `each`.
  *
+ * Dispatches to the `forEach` method of the second argument, if present.
+ *
  * @func
  * @memberOf R
+ * @since v0.1.1
  * @category List
  * @sig (a -> *) -> [a] -> [a]
  * @param {Function} fn The function to invoke. Receives one argument, `value`.
@@ -272,17 +291,23 @@ var _hasMethod = _dereq_('./internal/_hasMethod');
  * @return {Array} The original list.
  * @example
  *
- *      var printXPlusFive = function(x) { console.log(x + 5); };
+ *      var printXPlusFive = x => console.log(x + 5);
  *      R.forEach(printXPlusFive, [1, 2, 3]); //=> [1, 2, 3]
  *      //-> 6
  *      //-> 7
  *      //-> 8
  */
-module.exports = _curry2(function forEach(fn, list) {
-  return _hasMethod('forEach', list) ? list.forEach(fn) : _forEach(fn, list);
-});
+module.exports = _curry2(_checkForMethod('forEach', function forEach(fn, list) {
+  var len = list.length;
+  var idx = 0;
+  while (idx < len) {
+    fn(list[idx]);
+    idx += 1;
+  }
+  return list;
+}));
 
-},{"./internal/_curry2":13,"./internal/_forEach":16,"./internal/_hasMethod":18}],8:[function(_dereq_,module,exports){
+},{"./internal/_checkForMethod":13,"./internal/_curry2":17}],9:[function(_dereq_,module,exports){
 var _curry2 = _dereq_('./internal/_curry2');
 
 
@@ -293,6 +318,7 @@ var _curry2 = _dereq_('./internal/_curry2');
  *
  * @func
  * @memberOf R
+ * @since v0.15.0
  * @category Relation
  * @sig a -> a -> Boolean
  * @param {*} a
@@ -319,7 +345,7 @@ module.exports = _curry2(function identical(a, b) {
   }
 });
 
-},{"./internal/_curry2":13}],9:[function(_dereq_,module,exports){
+},{"./internal/_curry2":17}],10:[function(_dereq_,module,exports){
 var _curry1 = _dereq_('./internal/_curry1');
 var _identity = _dereq_('./internal/_identity');
 
@@ -330,6 +356,7 @@ var _identity = _dereq_('./internal/_identity');
  *
  * @func
  * @memberOf R
+ * @since v0.1.0
  * @category Function
  * @sig a -> a
  * @param {*} x The value to return.
@@ -343,59 +370,81 @@ var _identity = _dereq_('./internal/_identity');
  */
 module.exports = _curry1(_identity);
 
-},{"./internal/_curry1":12,"./internal/_identity":19}],10:[function(_dereq_,module,exports){
+},{"./internal/_curry1":16,"./internal/_identity":24}],11:[function(_dereq_,module,exports){
+module.exports = function _arity(n, fn) {
+  // jshint unused:vars
+  switch (n) {
+    case 0: return function() { return fn.apply(this, arguments); };
+    case 1: return function(a0) { return fn.apply(this, arguments); };
+    case 2: return function(a0, a1) { return fn.apply(this, arguments); };
+    case 3: return function(a0, a1, a2) { return fn.apply(this, arguments); };
+    case 4: return function(a0, a1, a2, a3) { return fn.apply(this, arguments); };
+    case 5: return function(a0, a1, a2, a3, a4) { return fn.apply(this, arguments); };
+    case 6: return function(a0, a1, a2, a3, a4, a5) { return fn.apply(this, arguments); };
+    case 7: return function(a0, a1, a2, a3, a4, a5, a6) { return fn.apply(this, arguments); };
+    case 8: return function(a0, a1, a2, a3, a4, a5, a6, a7) { return fn.apply(this, arguments); };
+    case 9: return function(a0, a1, a2, a3, a4, a5, a6, a7, a8) { return fn.apply(this, arguments); };
+    case 10: return function(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9) { return fn.apply(this, arguments); };
+    default: throw new Error('First argument to _arity must be a non-negative integer no greater than ten');
+  }
+};
+
+},{}],12:[function(_dereq_,module,exports){
+module.exports = function _arrayFromIterator(iter) {
+  var list = [];
+  var next;
+  while (!(next = iter.next()).done) {
+    list.push(next.value);
+  }
+  return list;
+};
+
+},{}],13:[function(_dereq_,module,exports){
+var _isArray = _dereq_('./_isArray');
+var _slice = _dereq_('./_slice');
+
+
 /**
- * Basic, right-associative composition function. Accepts two functions and returns the
- * composite function; this composite function represents the operation `var h = f(g(x))`,
- * where `f` is the first argument, `g` is the second argument, and `x` is whatever
- * argument(s) are passed to `h`.
- *
- * This function's main use is to build the more general `compose` function, which accepts
- * any number of functions.
+ * Similar to hasMethod, this checks whether a function has a [methodname]
+ * function. If it isn't an array it will execute that function otherwise it will
+ * default to the ramda implementation.
  *
  * @private
- * @category Function
- * @param {Function} f A function.
- * @param {Function} g A function.
- * @return {Function} A new function that is the equivalent of `f(g(x))`.
- * @example
- *
- *      var double = function(x) { return x * 2; };
- *      var square = function(x) { return x * x; };
- *      var squareThenDouble = _compose(double, square);
- *
- *      squareThenDouble(5); //≅ double(square(5)) => 50
+ * @param {Function} fn ramda implemtation
+ * @param {String} methodname property to check for a custom implementation
+ * @return {Object} Whatever the return value of the method is.
  */
-module.exports = function _compose(f, g) {
+module.exports = function _checkForMethod(methodname, fn) {
   return function() {
-    return f.call(this, g.apply(this, arguments));
-  };
-};
-
-},{}],11:[function(_dereq_,module,exports){
-var arity = _dereq_('../arity');
-
-
-/*
- * Returns a function that makes a multi-argument version of compose from
- * either _compose or _composeP.
- */
-module.exports = function _createComposer(composeFunction) {
-  return function() {
-    var fn = arguments[arguments.length - 1];
-    var length = fn.length;
-    var idx = arguments.length - 2;
-    while (idx >= 0) {
-      fn = composeFunction(arguments[idx], fn);
-      idx -= 1;
+    var length = arguments.length;
+    if (length === 0) {
+      return fn();
     }
-    return arity(length, fn);
+    var obj = arguments[length - 1];
+    return (_isArray(obj) || typeof obj[methodname] !== 'function') ?
+      fn.apply(this, arguments) :
+      obj[methodname].apply(obj, _slice(arguments, 0, length - 1));
   };
 };
 
-},{"../arity":2}],12:[function(_dereq_,module,exports){
+},{"./_isArray":26,"./_slice":33}],14:[function(_dereq_,module,exports){
+module.exports = function _complement(f) {
+  return function() {
+    return !f.apply(this, arguments);
+  };
+};
+
+},{}],15:[function(_dereq_,module,exports){
+var _indexOf = _dereq_('./_indexOf');
+
+
+module.exports = function _contains(a, list) {
+  return _indexOf(list, a, 0) >= 0;
+};
+
+},{"./_indexOf":25}],16:[function(_dereq_,module,exports){
 /**
- * Optimized internal two-arity curry function.
+ * Optimized internal one-arity curry function.
  *
  * @private
  * @category Function
@@ -409,12 +458,12 @@ module.exports = function _curry1(fn) {
     } else if (a != null && a['@@functional/placeholder'] === true) {
       return f1;
     } else {
-      return fn(a);
+      return fn.apply(this, arguments);
     }
   };
 };
 
-},{}],13:[function(_dereq_,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 var _curry1 = _dereq_('./_curry1');
 
 
@@ -448,8 +497,64 @@ module.exports = function _curry2(fn) {
   };
 };
 
-},{"./_curry1":12}],14:[function(_dereq_,module,exports){
-var arity = _dereq_('../arity');
+},{"./_curry1":16}],18:[function(_dereq_,module,exports){
+var _curry1 = _dereq_('./_curry1');
+var _curry2 = _dereq_('./_curry2');
+
+
+/**
+ * Optimized internal three-arity curry function.
+ *
+ * @private
+ * @category Function
+ * @param {Function} fn The function to curry.
+ * @return {Function} The curried function.
+ */
+module.exports = function _curry3(fn) {
+  return function f3(a, b, c) {
+    var n = arguments.length;
+    if (n === 0) {
+      return f3;
+    } else if (n === 1 && a != null && a['@@functional/placeholder'] === true) {
+      return f3;
+    } else if (n === 1) {
+      return _curry2(function(b, c) { return fn(a, b, c); });
+    } else if (n === 2 && a != null && a['@@functional/placeholder'] === true &&
+                          b != null && b['@@functional/placeholder'] === true) {
+      return f3;
+    } else if (n === 2 && a != null && a['@@functional/placeholder'] === true) {
+      return _curry2(function(a, c) { return fn(a, b, c); });
+    } else if (n === 2 && b != null && b['@@functional/placeholder'] === true) {
+      return _curry2(function(b, c) { return fn(a, b, c); });
+    } else if (n === 2) {
+      return _curry1(function(c) { return fn(a, b, c); });
+    } else if (n === 3 && a != null && a['@@functional/placeholder'] === true &&
+                          b != null && b['@@functional/placeholder'] === true &&
+                          c != null && c['@@functional/placeholder'] === true) {
+      return f3;
+    } else if (n === 3 && a != null && a['@@functional/placeholder'] === true &&
+                          b != null && b['@@functional/placeholder'] === true) {
+      return _curry2(function(a, b) { return fn(a, b, c); });
+    } else if (n === 3 && a != null && a['@@functional/placeholder'] === true &&
+                          c != null && c['@@functional/placeholder'] === true) {
+      return _curry2(function(a, c) { return fn(a, b, c); });
+    } else if (n === 3 && b != null && b['@@functional/placeholder'] === true &&
+                          c != null && c['@@functional/placeholder'] === true) {
+      return _curry2(function(b, c) { return fn(a, b, c); });
+    } else if (n === 3 && a != null && a['@@functional/placeholder'] === true) {
+      return _curry1(function(a) { return fn(a, b, c); });
+    } else if (n === 3 && b != null && b['@@functional/placeholder'] === true) {
+      return _curry1(function(b) { return fn(a, b, c); });
+    } else if (n === 3 && c != null && c['@@functional/placeholder'] === true) {
+      return _curry1(function(c) { return fn(a, b, c); });
+    } else {
+      return fn(a, b, c);
+    }
+  };
+};
+
+},{"./_curry1":16,"./_curry2":17}],19:[function(_dereq_,module,exports){
+var _arity = _dereq_('./_arity');
 
 
 /**
@@ -484,132 +589,181 @@ module.exports = function _curryN(length, received, fn) {
       }
       combinedIdx += 1;
     }
-    return left <= 0 ? fn.apply(this, combined) : arity(left, _curryN(length, combined, fn));
+    return left <= 0 ? fn.apply(this, combined) : _arity(left, _curryN(length, combined, fn));
   };
 };
 
-},{"../arity":2}],15:[function(_dereq_,module,exports){
+},{"./_arity":11}],20:[function(_dereq_,module,exports){
+var _isArray = _dereq_('./_isArray');
+var _isTransformer = _dereq_('./_isTransformer');
+var _slice = _dereq_('./_slice');
+
+
+/**
+ * Returns a function that dispatches with different strategies based on the
+ * object in list position (last argument). If it is an array, executes [fn].
+ * Otherwise, if it has a  function with [methodname], it will execute that
+ * function (functor case). Otherwise, if it is a transformer, uses transducer
+ * [xf] to return a new transformer (transducer case). Otherwise, it will
+ * default to executing [fn].
+ *
+ * @private
+ * @param {String} methodname property to check for a custom implementation
+ * @param {Function} xf transducer to initialize if object is transformer
+ * @param {Function} fn default ramda implementation
+ * @return {Function} A function that dispatches on object in list position
+ */
+module.exports = function _dispatchable(methodname, xf, fn) {
+  return function() {
+    var length = arguments.length;
+    if (length === 0) {
+      return fn();
+    }
+    var obj = arguments[length - 1];
+    if (!_isArray(obj)) {
+      var args = _slice(arguments, 0, length - 1);
+      if (typeof obj[methodname] === 'function') {
+        return obj[methodname].apply(obj, args);
+      }
+      if (_isTransformer(obj)) {
+        var transducer = xf.apply(null, args);
+        return transducer(obj);
+      }
+    }
+    return fn.apply(this, arguments);
+  };
+};
+
+},{"./_isArray":26,"./_isTransformer":28,"./_slice":33}],21:[function(_dereq_,module,exports){
+var _arrayFromIterator = _dereq_('./_arrayFromIterator');
 var _has = _dereq_('./_has');
 var identical = _dereq_('../identical');
 var keys = _dereq_('../keys');
 var type = _dereq_('../type');
 
-// The algorithm used to handle cyclic structures is
-// inspired by underscore's isEqual
-module.exports = function _eqDeep(a, b, stackA, stackB) {
-  var typeA = type(a);
-  if (typeA !== type(b)) {
-    return false;
-  }
 
-  if (typeA === 'Boolean' || typeA === 'Number' || typeA === 'String') {
-    return typeof a === 'object' ?
-      typeof b === 'object' && identical(a.valueOf(), b.valueOf()) :
-      identical(a, b);
-  }
-
+module.exports = function _equals(a, b, stackA, stackB) {
   if (identical(a, b)) {
     return true;
   }
 
-  if (typeA === 'RegExp') {
-    // RegExp equality algorithm: http://stackoverflow.com/a/10776635
-    return (a.source === b.source) &&
-           (a.global === b.global) &&
-           (a.ignoreCase === b.ignoreCase) &&
-           (a.multiline === b.multiline) &&
-           (a.sticky === b.sticky) &&
-           (a.unicode === b.unicode);
+  if (type(a) !== type(b)) {
+    return false;
   }
 
-  if (Object(a) === a) {
-    if (typeA === 'Date' && a.getTime() !== b.getTime()) {
-      return false;
-    }
+  if (a == null || b == null) {
+    return false;
+  }
 
-    var keysA = keys(a);
-    if (keysA.length !== keys(b).length) {
-      return false;
-    }
+  if (typeof a.equals === 'function' || typeof b.equals === 'function') {
+    return typeof a.equals === 'function' && a.equals(b) &&
+           typeof b.equals === 'function' && b.equals(a);
+  }
 
-    var idx = stackA.length - 1;
-    while (idx >= 0) {
-      if (stackA[idx] === a) {
-        return stackB[idx] === b;
-      }
-      idx -= 1;
-    }
-
-    stackA[stackA.length] = a;
-    stackB[stackB.length] = b;
-    idx = keysA.length - 1;
-    while (idx >= 0) {
-      var key = keysA[idx];
-      if (!_has(key, b) || !_eqDeep(b[key], a[key], stackA, stackB)) {
+  switch (type(a)) {
+    case 'Arguments':
+    case 'Array':
+    case 'Object':
+      break;
+    case 'Boolean':
+    case 'Number':
+    case 'String':
+      if (!(typeof a === typeof b && identical(a.valueOf(), b.valueOf()))) {
         return false;
       }
-      idx -= 1;
-    }
-    stackA.pop();
-    stackB.pop();
-    return true;
+      break;
+    case 'Date':
+      if (!identical(a.valueOf(), b.valueOf())) {
+        return false;
+      }
+      break;
+    case 'RegExp':
+      if (!(a.source === b.source &&
+            a.global === b.global &&
+            a.ignoreCase === b.ignoreCase &&
+            a.multiline === b.multiline &&
+            a.sticky === b.sticky &&
+            a.unicode === b.unicode)) {
+        return false;
+      }
+      break;
+    case 'Map':
+    case 'Set':
+      if (!_equals(_arrayFromIterator(a.entries()), _arrayFromIterator(b.entries()), stackA, stackB)) {
+        return false;
+      }
+      break;
+    case 'Int8Array':
+    case 'Uint8Array':
+    case 'Uint8ClampedArray':
+    case 'Int16Array':
+    case 'Uint16Array':
+    case 'Int32Array':
+    case 'Uint32Array':
+    case 'Float32Array':
+    case 'Float64Array':
+      break;
+    case 'ArrayBuffer':
+      break;
+    default:
+      // Values of other types are only equal if identical.
+      return false;
   }
-  return false;
+
+  var keysA = keys(a);
+  if (keysA.length !== keys(b).length) {
+    return false;
+  }
+
+  var idx = stackA.length - 1;
+  while (idx >= 0) {
+    if (stackA[idx] === a) {
+      return stackB[idx] === b;
+    }
+    idx -= 1;
+  }
+
+  stackA.push(a);
+  stackB.push(b);
+  idx = keysA.length - 1;
+  while (idx >= 0) {
+    var key = keysA[idx];
+    if (!(_has(key, b) && _equals(b[key], a[key], stackA, stackB))) {
+      return false;
+    }
+    idx -= 1;
+  }
+  stackA.pop();
+  stackB.pop();
+  return true;
 };
 
-},{"../identical":8,"../keys":26,"../type":29,"./_has":17}],16:[function(_dereq_,module,exports){
-module.exports = function _forEach(fn, list) {
-  var idx = 0;
-  while (idx < list.length) {
-    fn(list[idx]);
+},{"../identical":9,"../keys":40,"../type":49,"./_arrayFromIterator":12,"./_has":23}],22:[function(_dereq_,module,exports){
+module.exports = function _filter(fn, list) {
+  var idx = 0, len = list.length, result = [];
+  while (idx < len) {
+    if (fn(list[idx])) {
+      result[result.length] = list[idx];
+    }
     idx += 1;
   }
-  // i can't bear not to return *something*
-  return list;
+  return result;
 };
 
-},{}],17:[function(_dereq_,module,exports){
+},{}],23:[function(_dereq_,module,exports){
 module.exports = function _has(prop, obj) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 };
 
-},{}],18:[function(_dereq_,module,exports){
-var _isArray = _dereq_('./_isArray');
-
-
-/**
- * Private function that determines whether or not a provided object has a given method.
- * Does not ignore methods stored on the object's prototype chain. Used for dynamically
- * dispatching Ramda methods to non-Array objects.
- *
- * @private
- * @param {String} methodName The name of the method to check for.
- * @param {Object} obj The object to test.
- * @return {Boolean} `true` has a given method, `false` otherwise.
- * @example
- *
- *      var person = { name: 'John' };
- *      person.shout = function() { alert(this.name); };
- *
- *      _hasMethod('shout', person); //=> true
- *      _hasMethod('foo', person); //=> false
- */
-module.exports = function _hasMethod(methodName, obj) {
-  return obj != null && !_isArray(obj) && typeof obj[methodName] === 'function';
-};
-
-},{"./_isArray":21}],19:[function(_dereq_,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 module.exports = function _identity(x) { return x; };
 
-},{}],20:[function(_dereq_,module,exports){
+},{}],25:[function(_dereq_,module,exports){
 var equals = _dereq_('../equals');
 
 
 module.exports = function _indexOf(list, item, from) {
-  var idx = 0;
-  if (typeof from === 'number') {
-    idx = from < 0 ? Math.max(0, list.length + from) : from;
-  }
+  var idx = from;
   while (idx < list.length) {
     if (equals(list[idx], item)) {
       return idx;
@@ -619,7 +773,7 @@ module.exports = function _indexOf(list, item, from) {
   return -1;
 };
 
-},{"../equals":6}],21:[function(_dereq_,module,exports){
+},{"../equals":6}],26:[function(_dereq_,module,exports){
 /**
  * Tests whether or not an object is an array.
  *
@@ -638,22 +792,143 @@ module.exports = Array.isArray || function _isArray(val) {
           Object.prototype.toString.call(val) === '[object Array]');
 };
 
-},{}],22:[function(_dereq_,module,exports){
-module.exports = function _map(fn, list) {
-  var idx = 0, result = [];
-  while (idx < list.length) {
-    result[idx] = fn(list[idx]);
+},{}],27:[function(_dereq_,module,exports){
+module.exports = function _isString(x) {
+  return Object.prototype.toString.call(x) === '[object String]';
+};
+
+},{}],28:[function(_dereq_,module,exports){
+module.exports = function _isTransformer(obj) {
+  return typeof obj['@@transducer/step'] === 'function';
+};
+
+},{}],29:[function(_dereq_,module,exports){
+module.exports = function _map(fn, functor) {
+  var idx = 0;
+  var len = functor.length;
+  var result = Array(len);
+  while (idx < len) {
+    result[idx] = fn(functor[idx]);
     idx += 1;
   }
   return result;
 };
 
-},{}],23:[function(_dereq_,module,exports){
-module.exports = function _quote(s) {
-  return '"' + s.replace(/"/g, '\\"') + '"';
+},{}],30:[function(_dereq_,module,exports){
+module.exports = function _pipe(f, g) {
+  return function() {
+    return g.call(this, f.apply(this, arguments));
+  };
 };
 
-},{}],24:[function(_dereq_,module,exports){
+},{}],31:[function(_dereq_,module,exports){
+module.exports = function _quote(s) {
+  var escaped = s
+    .replace(/\\/g, '\\\\')
+    .replace(/[\b]/g, '\\b')  // \b matches word boundary; [\b] matches backspace
+    .replace(/\f/g, '\\f')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t')
+    .replace(/\v/g, '\\v')
+    .replace(/\0/g, '\\0');
+
+  return '"' + escaped.replace(/"/g, '\\"') + '"';
+};
+
+},{}],32:[function(_dereq_,module,exports){
+var _xwrap = _dereq_('./_xwrap');
+var bind = _dereq_('../bind');
+var isArrayLike = _dereq_('../isArrayLike');
+
+
+module.exports = (function() {
+  function _arrayReduce(xf, acc, list) {
+    var idx = 0, len = list.length;
+    while (idx < len) {
+      acc = xf['@@transducer/step'](acc, list[idx]);
+      if (acc && acc['@@transducer/reduced']) {
+        acc = acc['@@transducer/value'];
+        break;
+      }
+      idx += 1;
+    }
+    return xf['@@transducer/result'](acc);
+  }
+
+  function _iterableReduce(xf, acc, iter) {
+    var step = iter.next();
+    while (!step.done) {
+      acc = xf['@@transducer/step'](acc, step.value);
+      if (acc && acc['@@transducer/reduced']) {
+        acc = acc['@@transducer/value'];
+        break;
+      }
+      step = iter.next();
+    }
+    return xf['@@transducer/result'](acc);
+  }
+
+  function _methodReduce(xf, acc, obj) {
+    return xf['@@transducer/result'](obj.reduce(bind(xf['@@transducer/step'], xf), acc));
+  }
+
+  var symIterator = (typeof Symbol !== 'undefined') ? Symbol.iterator : '@@iterator';
+  return function _reduce(fn, acc, list) {
+    if (typeof fn === 'function') {
+      fn = _xwrap(fn);
+    }
+    if (isArrayLike(list)) {
+      return _arrayReduce(fn, acc, list);
+    }
+    if (typeof list.reduce === 'function') {
+      return _methodReduce(fn, acc, list);
+    }
+    if (list[symIterator] != null) {
+      return _iterableReduce(fn, acc, list[symIterator]());
+    }
+    if (typeof list.next === 'function') {
+      return _iterableReduce(fn, acc, list);
+    }
+    throw new TypeError('reduce: list must be array or iterable');
+  };
+})();
+
+},{"../bind":2,"../isArrayLike":39,"./_xwrap":38}],33:[function(_dereq_,module,exports){
+/**
+ * An optimized, private array `slice` implementation.
+ *
+ * @private
+ * @param {Arguments|Array} args The array or arguments object to consider.
+ * @param {Number} [from=0] The array index to slice from, inclusive.
+ * @param {Number} [to=args.length] The array index to slice to, exclusive.
+ * @return {Array} A new, sliced array.
+ * @example
+ *
+ *      _slice([1, 2, 3, 4, 5], 1, 3); //=> [2, 3]
+ *
+ *      var firstThreeArgs = function(a, b, c, d) {
+ *        return _slice(arguments, 0, 3);
+ *      };
+ *      firstThreeArgs(1, 2, 3, 4); //=> [1, 2, 3]
+ */
+module.exports = function _slice(args, from, to) {
+  switch (arguments.length) {
+    case 1: return _slice(args, 0, args.length);
+    case 2: return _slice(args, from, args.length);
+    default:
+      var list = [];
+      var idx = 0;
+      var len = Math.max(0, Math.min(args.length, to) - from);
+      while (idx < len) {
+        list[idx] = args[from + idx];
+        idx += 1;
+      }
+      return list;
+  }
+};
+
+},{}],34:[function(_dereq_,module,exports){
 /**
  * Polyfill from <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString>.
  */
@@ -677,25 +952,31 @@ module.exports = (function() {
     };
 }());
 
-},{}],25:[function(_dereq_,module,exports){
-var _indexOf = _dereq_('./_indexOf');
+},{}],35:[function(_dereq_,module,exports){
+var _contains = _dereq_('./_contains');
 var _map = _dereq_('./_map');
 var _quote = _dereq_('./_quote');
 var _toISOString = _dereq_('./_toISOString');
 var keys = _dereq_('../keys');
+var reject = _dereq_('../reject');
 
 
 module.exports = function _toString(x, seen) {
   var recur = function recur(y) {
     var xs = seen.concat([x]);
-    return _indexOf(xs, y) >= 0 ? '<Circular>' : _toString(y, xs);
+    return _contains(y, xs) ? '<Circular>' : _toString(y, xs);
+  };
+
+  //  mapPairs :: (Object, [String]) -> [String]
+  var mapPairs = function(obj, keys) {
+    return _map(function(k) { return _quote(k) + ': ' + recur(obj[k]); }, keys.slice().sort());
   };
 
   switch (Object.prototype.toString.call(x)) {
     case '[object Arguments]':
       return '(function() { return arguments; }(' + _map(recur, x).join(', ') + '))';
     case '[object Array]':
-      return '[' + _map(recur, x).join(', ') + ']';
+      return '[' + _map(recur, x).concat(mapPairs(x, reject(function(k) { return /^\d+$/.test(k); }, keys(x)))).join(', ') + ']';
     case '[object Boolean]':
       return typeof x === 'object' ? 'new Boolean(' + recur(x.valueOf()) + ')' : x.toString();
     case '[object Date]':
@@ -712,11 +993,93 @@ module.exports = function _toString(x, seen) {
       return (typeof x.constructor === 'function' && x.constructor.name !== 'Object' &&
               typeof x.toString === 'function' && x.toString() !== '[object Object]') ?
              x.toString() :  // Function, RegExp, user-defined types
-             '{' + _map(function(k) { return _quote(k) + ': ' + recur(x[k]); }, keys(x).sort()).join(', ') + '}';
+             '{' + mapPairs(x, keys(x)).join(', ') + '}';
   }
 };
 
-},{"../keys":26,"./_indexOf":20,"./_map":22,"./_quote":23,"./_toISOString":24}],26:[function(_dereq_,module,exports){
+},{"../keys":40,"../reject":44,"./_contains":15,"./_map":29,"./_quote":31,"./_toISOString":34}],36:[function(_dereq_,module,exports){
+module.exports = {
+  init: function() {
+    return this.xf['@@transducer/init']();
+  },
+  result: function(result) {
+    return this.xf['@@transducer/result'](result);
+  }
+};
+
+},{}],37:[function(_dereq_,module,exports){
+var _curry2 = _dereq_('./_curry2');
+var _xfBase = _dereq_('./_xfBase');
+
+
+module.exports = (function() {
+  function XFilter(f, xf) {
+    this.xf = xf;
+    this.f = f;
+  }
+  XFilter.prototype['@@transducer/init'] = _xfBase.init;
+  XFilter.prototype['@@transducer/result'] = _xfBase.result;
+  XFilter.prototype['@@transducer/step'] = function(result, input) {
+    return this.f(input) ? this.xf['@@transducer/step'](result, input) : result;
+  };
+
+  return _curry2(function _xfilter(f, xf) { return new XFilter(f, xf); });
+})();
+
+},{"./_curry2":17,"./_xfBase":36}],38:[function(_dereq_,module,exports){
+module.exports = (function() {
+  function XWrap(fn) {
+    this.f = fn;
+  }
+  XWrap.prototype['@@transducer/init'] = function() {
+    throw new Error('init not implemented on XWrap');
+  };
+  XWrap.prototype['@@transducer/result'] = function(acc) { return acc; };
+  XWrap.prototype['@@transducer/step'] = function(acc, x) {
+    return this.f(acc, x);
+  };
+
+  return function _xwrap(fn) { return new XWrap(fn); };
+}());
+
+},{}],39:[function(_dereq_,module,exports){
+var _curry1 = _dereq_('./internal/_curry1');
+var _isArray = _dereq_('./internal/_isArray');
+
+
+/**
+ * Tests whether or not an object is similar to an array.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.5.0
+ * @category Type
+ * @category List
+ * @sig * -> Boolean
+ * @param {*} x The object to test.
+ * @return {Boolean} `true` if `x` has a numeric length property and extreme indices defined; `false` otherwise.
+ * @example
+ *
+ *      R.isArrayLike([]); //=> true
+ *      R.isArrayLike(true); //=> false
+ *      R.isArrayLike({}); //=> false
+ *      R.isArrayLike({length: 10}); //=> false
+ *      R.isArrayLike({0: 'zero', 9: 'nine', length: 10}); //=> true
+ */
+module.exports = _curry1(function isArrayLike(x) {
+  if (_isArray(x)) { return true; }
+  if (!x) { return false; }
+  if (typeof x !== 'object') { return false; }
+  if (x instanceof String) { return false; }
+  if (x.nodeType === 1) { return !!x.length; }
+  if (x.length === 0) { return true; }
+  if (x.length > 0) {
+    return x.hasOwnProperty(0) && x.hasOwnProperty(x.length - 1);
+  }
+  return false;
+});
+
+},{"./internal/_curry1":16,"./internal/_isArray":26}],40:[function(_dereq_,module,exports){
 var _curry1 = _dereq_('./internal/_curry1');
 var _has = _dereq_('./internal/_has');
 
@@ -729,6 +1092,7 @@ var _has = _dereq_('./internal/_has');
  *
  * @func
  * @memberOf R
+ * @since v0.1.0
  * @category Object
  * @sig {k: v} -> [k]
  * @param {Object} obj The object to extract properties from
@@ -782,24 +1146,25 @@ module.exports = (function() {
     });
 }());
 
-},{"./internal/_curry1":12,"./internal/_has":17}],27:[function(_dereq_,module,exports){
+},{"./internal/_curry1":16,"./internal/_has":23}],41:[function(_dereq_,module,exports){
 var _curry1 = _dereq_('./internal/_curry1');
 
 
 /**
  * Accepts a function `fn` and returns a function that guards invocation of `fn` such that
  * `fn` can only ever be called once, no matter how many times the returned function is
- * invoked.
+ * invoked. The first value calculated is returned in subsequent invocations.
  *
  * @func
  * @memberOf R
+ * @since v0.1.0
  * @category Function
  * @sig (a... -> b) -> (a... -> b)
  * @param {Function} fn The function to wrap in a call-only-once wrapper.
  * @return {Function} The wrapped function.
  * @example
  *
- *      var addOneOnce = R.once(function(x){ return x + 1; });
+ *      var addOneOnce = R.once(x => x + 1);
  *      addOneOnce(10); //=> 11
  *      addOneOnce(addOneOnce(50)); //=> 11
  */
@@ -815,7 +1180,215 @@ module.exports = _curry1(function once(fn) {
   };
 });
 
-},{"./internal/_curry1":12}],28:[function(_dereq_,module,exports){
+},{"./internal/_curry1":16}],42:[function(_dereq_,module,exports){
+var _arity = _dereq_('./internal/_arity');
+var _pipe = _dereq_('./internal/_pipe');
+var reduce = _dereq_('./reduce');
+var tail = _dereq_('./tail');
+
+
+/**
+ * Performs left-to-right function composition. The leftmost function may have
+ * any arity; the remaining functions must be unary.
+ *
+ * In some libraries this function is named `sequence`.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.1.0
+ * @category Function
+ * @sig (((a, b, ..., n) -> o), (o -> p), ..., (x -> y), (y -> z)) -> ((a, b, ..., n) -> z)
+ * @param {...Function} functions
+ * @return {Function}
+ * @see R.compose
+ * @example
+ *
+ *      var f = R.pipe(Math.pow, R.negate, R.inc);
+ *
+ *      f(3, 4); // -(3^4) + 1
+ */
+module.exports = function pipe() {
+  if (arguments.length === 0) {
+    throw new Error('pipe requires at least one argument');
+  }
+  return _arity(arguments[0].length,
+                reduce(_pipe, arguments[0], tail(arguments)));
+};
+
+},{"./internal/_arity":11,"./internal/_pipe":30,"./reduce":43,"./tail":47}],43:[function(_dereq_,module,exports){
+var _curry3 = _dereq_('./internal/_curry3');
+var _reduce = _dereq_('./internal/_reduce');
+
+
+/**
+ * Returns a single item by iterating through the list, successively calling the iterator
+ * function and passing it an accumulator value and the current value from the array, and
+ * then passing the result to the next call.
+ *
+ * The iterator function receives two values: *(acc, value)*.  It may use `R.reduced` to
+ * shortcut the iteration.
+ *
+ * Note: `R.reduce` does not skip deleted or unassigned indices (sparse arrays), unlike
+ * the native `Array.prototype.reduce` method. For more details on this behavior, see:
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce#Description
+ * @see R.reduced
+ *
+ * Dispatches to the `reduce` method of the third argument, if present.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.1.0
+ * @category List
+ * @sig (a,b -> a) -> a -> [b] -> a
+ * @param {Function} fn The iterator function. Receives two values, the accumulator and the
+ *        current element from the array.
+ * @param {*} acc The accumulator value.
+ * @param {Array} list The list to iterate over.
+ * @return {*} The final, accumulated value.
+ * @example
+ *
+ *      var numbers = [1, 2, 3];
+ *      var add = (a, b) => a + b;
+ *
+ *      R.reduce(add, 10, numbers); //=> 16
+ */
+module.exports = _curry3(_reduce);
+
+},{"./internal/_curry3":18,"./internal/_reduce":32}],44:[function(_dereq_,module,exports){
+var _complement = _dereq_('./internal/_complement');
+var _curry2 = _dereq_('./internal/_curry2');
+var filter = _dereq_('./filter');
+
+
+/**
+ * Similar to `filter`, except that it keeps only values for which the given predicate
+ * function returns falsy. The predicate function is passed one argument: *(value)*.
+ *
+ * Acts as a transducer if a transformer is given in list position.
+ * @see R.transduce
+ *
+ * @func
+ * @memberOf R
+ * @since v0.1.0
+ * @category List
+ * @sig (a -> Boolean) -> [a] -> [a]
+ * @param {Function} fn The function called per iteration.
+ * @param {Array} list The collection to iterate over.
+ * @return {Array} The new filtered array.
+ * @see R.filter
+ * @example
+ *
+ *      var isOdd = (n) => n % 2 === 1;
+ *
+ *      R.reject(isOdd, [1, 2, 3, 4]); //=> [2, 4]
+ */
+module.exports = _curry2(function reject(fn, list) {
+  return filter(_complement(fn), list);
+});
+
+},{"./filter":7,"./internal/_complement":14,"./internal/_curry2":17}],45:[function(_dereq_,module,exports){
+var _curry1 = _dereq_('./internal/_curry1');
+var _isString = _dereq_('./internal/_isString');
+var _slice = _dereq_('./internal/_slice');
+
+
+/**
+ * Returns a new list or string with the elements or characters in reverse
+ * order.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.1.0
+ * @category List
+ * @sig [a] -> [a]
+ * @sig String -> String
+ * @param {Array|String} list
+ * @return {Array|String}
+ * @example
+ *
+ *      R.reverse([1, 2, 3]);  //=> [3, 2, 1]
+ *      R.reverse([1, 2]);     //=> [2, 1]
+ *      R.reverse([1]);        //=> [1]
+ *      R.reverse([]);         //=> []
+ *
+ *      R.reverse('abc');      //=> 'cba'
+ *      R.reverse('ab');       //=> 'ba'
+ *      R.reverse('a');        //=> 'a'
+ *      R.reverse('');         //=> ''
+ */
+module.exports = _curry1(function reverse(list) {
+  return _isString(list) ? list.split('').reverse().join('') :
+                           _slice(list).reverse();
+});
+
+},{"./internal/_curry1":16,"./internal/_isString":27,"./internal/_slice":33}],46:[function(_dereq_,module,exports){
+var _checkForMethod = _dereq_('./internal/_checkForMethod');
+var _curry3 = _dereq_('./internal/_curry3');
+
+
+/**
+ * Returns the elements of the given list or string (or object with a `slice`
+ * method) from `fromIndex` (inclusive) to `toIndex` (exclusive).
+ *
+ * Dispatches to the `slice` method of the third argument, if present.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.1.4
+ * @category List
+ * @sig Number -> Number -> [a] -> [a]
+ * @sig Number -> Number -> String -> String
+ * @param {Number} fromIndex The start index (inclusive).
+ * @param {Number} toIndex The end index (exclusive).
+ * @param {*} list
+ * @return {*}
+ * @example
+ *
+ *      R.slice(1, 3, ['a', 'b', 'c', 'd']);        //=> ['b', 'c']
+ *      R.slice(1, Infinity, ['a', 'b', 'c', 'd']); //=> ['b', 'c', 'd']
+ *      R.slice(0, -1, ['a', 'b', 'c', 'd']);       //=> ['a', 'b', 'c']
+ *      R.slice(-3, -1, ['a', 'b', 'c', 'd']);      //=> ['b', 'c']
+ *      R.slice(0, 3, 'ramda');                     //=> 'ram'
+ */
+module.exports = _curry3(_checkForMethod('slice', function slice(fromIndex, toIndex, list) {
+  return Array.prototype.slice.call(list, fromIndex, toIndex);
+}));
+
+},{"./internal/_checkForMethod":13,"./internal/_curry3":18}],47:[function(_dereq_,module,exports){
+var _checkForMethod = _dereq_('./internal/_checkForMethod');
+var slice = _dereq_('./slice');
+
+
+/**
+ * Returns all but the first element of the given list or string (or object
+ * with a `tail` method).
+ *
+ * Dispatches to the `slice` method of the first argument, if present.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.1.0
+ * @category List
+ * @see R.head, R.init, R.last
+ * @sig [a] -> [a]
+ * @sig String -> String
+ * @param {*} list
+ * @return {*}
+ * @example
+ *
+ *      R.tail([1, 2, 3]);  //=> [2, 3]
+ *      R.tail([1, 2]);     //=> [2]
+ *      R.tail([1]);        //=> []
+ *      R.tail([]);         //=> []
+ *
+ *      R.tail('abc');  //=> 'bc'
+ *      R.tail('ab');   //=> 'b'
+ *      R.tail('a');    //=> ''
+ *      R.tail('');     //=> ''
+ */
+module.exports = _checkForMethod('tail', slice(1, Infinity));
+
+},{"./internal/_checkForMethod":13,"./slice":46}],48:[function(_dereq_,module,exports){
 var _curry1 = _dereq_('./internal/_curry1');
 var _toString = _dereq_('./internal/_toString');
 
@@ -843,6 +1416,7 @@ var _toString = _dereq_('./internal/_toString');
  *
  * @func
  * @memberOf R
+ * @since v0.14.0
  * @category String
  * @sig * -> String
  * @param {*} val
@@ -857,7 +1431,7 @@ var _toString = _dereq_('./internal/_toString');
  */
 module.exports = _curry1(function toString(val) { return _toString(val, []); });
 
-},{"./internal/_curry1":12,"./internal/_toString":25}],29:[function(_dereq_,module,exports){
+},{"./internal/_curry1":16,"./internal/_toString":35}],49:[function(_dereq_,module,exports){
 var _curry1 = _dereq_('./internal/_curry1');
 
 
@@ -868,6 +1442,7 @@ var _curry1 = _dereq_('./internal/_curry1');
  *
  * @func
  * @memberOf R
+ * @since v0.8.0
  * @category Type
  * @sig (* -> {*}) -> String
  * @param {*} val The value to test
@@ -888,7 +1463,7 @@ module.exports = _curry1(function type(val) {
          Object.prototype.toString.call(val).slice(8, -1);
 });
 
-},{"./internal/_curry1":12}],30:[function(_dereq_,module,exports){
+},{"./internal/_curry1":16}],50:[function(_dereq_,module,exports){
 var curry = _dereq_('ramda/src/curry');
 var toString = _dereq_('ramda/src/toString');
 
@@ -917,9 +1492,6 @@ Either.of = Either.prototype.of = function(value) {
 };
 
 Either.prototype.chain = util.returnThis; // throw?
-
-
-Either.equals = Either.prototype.equals = util.getEquals(Either);
 
 Either.either = curry(function either(leftFn, rightFn, e) {
   if (e instanceof _Left) {
@@ -986,6 +1558,8 @@ _Right.prototype.toString = function() {
   return 'Either.Right(' + toString(this.value) + ')';
 };
 
+_Right.prototype.equals = util.getEquals(_Right);
+
 Either.Right = function(value) {
   return new _Right(value);
 };
@@ -1012,14 +1586,21 @@ _Left.prototype.toString = function() {
   return 'Either.Left(' + toString(this.value) + ')';
 };
 
+_Left.prototype.equals = util.getEquals(_Left);
+
 Either.Left = function(value) {
   return new _Left(value);
 };
 
 
+// either
+Either.prototype.either = function instanceEither(leftFn, rightFn) {
+  return this.isLeft ? leftFn(this.value) : rightFn(this.value);
+};
+
 module.exports = Either;
 
-},{"./internal/util":38,"ramda/src/curry":4,"ramda/src/toString":28}],31:[function(_dereq_,module,exports){
+},{"./internal/util":58,"ramda/src/curry":4,"ramda/src/toString":48}],51:[function(_dereq_,module,exports){
 var once = _dereq_('ramda/src/once');
 var forEach = _dereq_('ramda/src/forEach');
 var toString = _dereq_('ramda/src/toString');
@@ -1227,7 +1808,7 @@ Future.cache = function(f) {
 
 module.exports = Future;
 
-},{"./internal/util":38,"ramda/src/curry":4,"ramda/src/forEach":7,"ramda/src/once":27,"ramda/src/toString":28}],32:[function(_dereq_,module,exports){
+},{"./internal/util":58,"ramda/src/curry":4,"ramda/src/forEach":8,"ramda/src/once":41,"ramda/src/toString":48}],52:[function(_dereq_,module,exports){
 var compose = _dereq_('ramda/src/compose');
 var toString = _dereq_('ramda/src/toString');
 
@@ -1295,7 +1876,7 @@ IO.prototype.toString = function() {
   return 'IO(' + toString(this.fn) + ')';
 };
 
-},{"./internal/util":38,"ramda/src/compose":3,"ramda/src/toString":28}],33:[function(_dereq_,module,exports){
+},{"./internal/util":58,"ramda/src/compose":3,"ramda/src/toString":48}],53:[function(_dereq_,module,exports){
 var toString = _dereq_('ramda/src/toString');
 
 var util = _dereq_('./internal/util');
@@ -1394,7 +1975,7 @@ Identity.prototype.toString = function() {
 
 module.exports = Identity;
 
-},{"./internal/util":38,"ramda/src/toString":28}],34:[function(_dereq_,module,exports){
+},{"./internal/util":58,"ramda/src/toString":48}],54:[function(_dereq_,module,exports){
 var toString = _dereq_('ramda/src/toString');
 var curry = _dereq_('ramda/src/curry');
 
@@ -1447,6 +2028,17 @@ Maybe.maybe = curry(function(nothingVal, justFn, m) {
     return justFn(x);
   }, nothingVal);
 });
+
+Maybe.toMaybe = Maybe;
+
+// semigroup
+Just.prototype.concat = function(that) {
+  return that.isNothing ? this : this.of(
+    this.value.concat(that.value)
+  );
+};
+
+Nothing.prototype.concat = util.identity;
 
 // functor
 Just.prototype.map = function(f) {
@@ -1541,7 +2133,7 @@ Nothing.prototype.toString = function() {
 
 module.exports = Maybe;
 
-},{"./internal/util.js":38,"ramda/src/curry":4,"ramda/src/toString":28}],35:[function(_dereq_,module,exports){
+},{"./internal/util.js":58,"ramda/src/curry":4,"ramda/src/toString":48}],55:[function(_dereq_,module,exports){
 var compose = _dereq_('ramda/src/compose');
 var identity = _dereq_('ramda/src/identity');
 var toString = _dereq_('ramda/src/toString');
@@ -1643,7 +2235,7 @@ Reader.T = function(M) {
 
 module.exports = Reader;
 
-},{"ramda/src/always":1,"ramda/src/compose":3,"ramda/src/identity":9,"ramda/src/toString":28}],36:[function(_dereq_,module,exports){
+},{"ramda/src/always":1,"ramda/src/compose":3,"ramda/src/identity":10,"ramda/src/toString":48}],56:[function(_dereq_,module,exports){
 var curry = _dereq_('ramda/src/curry');
 
 var Identity = _dereq_('./Identity');
@@ -1731,7 +2323,7 @@ State.prototype.run = function(s) {
 
 module.exports = State;
 
-},{"./Identity":33,"./Tuple":37,"./internal/util":38,"ramda/src/curry":4}],37:[function(_dereq_,module,exports){
+},{"./Identity":53,"./Tuple":57,"./internal/util":58,"ramda/src/curry":4}],57:[function(_dereq_,module,exports){
 var toString = _dereq_('ramda/src/toString');
 var equals = _dereq_('ramda/src/equals');
 
@@ -1801,7 +2393,7 @@ _Tuple.prototype.toString = function() {
 
 module.exports = Tuple;
 
-},{"ramda/src/equals":6,"ramda/src/toString":28}],38:[function(_dereq_,module,exports){
+},{"ramda/src/equals":6,"ramda/src/toString":48}],58:[function(_dereq_,module,exports){
 var _equals = _dereq_('ramda/src/equals');
 
 
@@ -1870,14 +2462,14 @@ module.exports = {
 
 };
 
-},{"ramda/src/equals":6}],39:[function(_dereq_,module,exports){
+},{"ramda/src/equals":6}],59:[function(_dereq_,module,exports){
 var curryN = _dereq_('ramda/src/curryN');
 
 module.exports = curryN(3, function lift2(f, a1, a2) {
   return a1.map(f).ap(a2);
 });
 
-},{"ramda/src/curryN":5}],40:[function(_dereq_,module,exports){
+},{"ramda/src/curryN":5}],60:[function(_dereq_,module,exports){
 var curryN = _dereq_('ramda/src/curryN');
 
 module.exports = curryN(4, function lift3(f, a1, a2, a3) {
@@ -1898,5 +2490,5 @@ module.exports = {
   Tuple: _dereq_('./src/Tuple')
 };
 
-},{"./src/Either":30,"./src/Future":31,"./src/IO":32,"./src/Identity":33,"./src/Maybe":34,"./src/Reader":35,"./src/State":36,"./src/Tuple":37,"./src/lift2":39,"./src/lift3":40}]},{},[])("/index.js")
+},{"./src/Either":50,"./src/Future":51,"./src/IO":52,"./src/Identity":53,"./src/Maybe":54,"./src/Reader":55,"./src/State":56,"./src/Tuple":57,"./src/lift2":59,"./src/lift3":60}]},{},[])("/index.js")
 });
