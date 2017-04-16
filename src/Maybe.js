@@ -51,6 +51,8 @@ Maybe.maybe = curry(function(nothingVal, justFn, m) {
   }, nothingVal);
 });
 
+Maybe.toMaybe = Maybe;
+
 // semigroup
 Just.prototype.concat = function(that) {
   return that.isNothing ? this : this.of(

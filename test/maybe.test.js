@@ -111,7 +111,6 @@ describe('Maybe', function() {
           return Maybe.of(next(n - 1));
         }
       }, 100000);
-      console.log('a',a);
       assert.equal(true, Maybe.of('DONE').equals(a));
     });
 
@@ -219,6 +218,19 @@ describe('Maybe usage', function() {
     it('returns the first argument for a Nothing', function() {
       jsv.assert(jsv.forall('nat -> nat', 'nat', 'nat', function(f, n) {
         return R.equals(Maybe.maybe(n, f, Maybe.Nothing()), n);
+      }));
+    });
+  });
+
+  describe('#toMaybe', function() {
+    it('produces a Nothing for null/undefined', function() {
+      assert(Maybe.toMaybe(null).isNothing);
+      assert(Maybe.toMaybe(void 0).isNothing);
+    });
+
+    it('produces a Just for non-null values', function() {
+      jsv.assert(jsv.forall(jsv.integer, function(n) {
+        return Maybe.toMaybe(n).isJust;
       }));
     });
   });
