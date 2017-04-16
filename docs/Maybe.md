@@ -103,6 +103,13 @@ Returns `true` if the given `Maybe` instance is a `Just`, otherwise `false`.
 ```
 Returns `true` if the given `Maybe` instance is a `Nothing`, otherwise `false`.
 
+#### `Maybe.toMaybe`
+```hs
+:: a? -> Maybe a
+```
+Returns `Nothing` for a `null`/`undefined` value, otherwise a `Just` of the
+value for any other value.
+
 ### Instance methods
 
 #### `maybe.getOrElse`
