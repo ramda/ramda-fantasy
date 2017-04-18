@@ -17,8 +17,8 @@ const M       = require('ramda-fantasy').Maybe;
 const Just    = M.Just;
 const Nothing = M.Nothing;
 
-const safeDiv = R.curry((n, d) => d === 0 ? Nothing() : Just(n / d));
-const lookup = R.curry((k, obj) => k in obj ? Just(obj[k]) : Nothing());
+const safeDiv = (n, d) => d === 0 ? Nothing() : Just(n / d);
+const lookup = (k, obj) => k in obj ? Just(obj[k]) : Nothing();
 ```
 
 ## Interaction
@@ -49,14 +49,18 @@ somewhat similar in that neither can transform a `Nothing` into a `Just`, though
 within a `Just`.
 
 ```js
+const { curry } = require('ramda')
+
 // map :: Maybe a ~> (a -> b) -> Maybe b
 safeDiv(42, 2).map(R.inc); // Maybe(22)
 safeDiv(42, 0).map(R.inc); // Nothing
 
+const curriedLookup = curry(lookup)
+
 // chain :: Maybe a ~> (a -> Maybe b) -> Maybe b
-lookup('a', { a: { b: 'foo' }}).chain(lookup('b')); // Just('foo')
-lookup('a', { a: {}}).chain(lookup('b'));           // Nothing
-lookup('a', {}).chain(lookup('b'));                 // Nothing
+lookup('a', { a: { b: 'foo' }}).chain(curriedLookup('b')); // Just('foo')
+lookup('a', { a: {}}).chain(curriedLookup('b'));           // Nothing
+lookup('a', {}).chain(curriedLookup('b'));                 // Nothing
 ```
 
 ## Reference
@@ -144,7 +148,7 @@ returned.
 
 #### `maybe.reduce`
 ```hs
-:: Maybe a ~> (b -> a -> b) -> b -> b
+:: Maybe a ~> ((b, a) -> b, b) -> b
 ```
 Returns the result of applying the provided function to the initial value and
 the value of the `Just`. If the instance is a `Nothing`, then the initial value
