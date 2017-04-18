@@ -155,7 +155,7 @@ Returns a `StateT` instance that will evaluate to the provided value.
 
 #### `StateT.lift`
 ```hs
-:: Moand m => m a -> StateT s m a
+:: Monad m => m a -> StateT s m a
 ```
 Lifts the given monad into a `StateT` instance.
 
