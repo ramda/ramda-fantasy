@@ -135,6 +135,13 @@ the instance is a `Left`, or the second function if the instance is a `Right`.
 Determines whether the provided value is equal to this instance, ensuring both
 are of the same constructor and both contain equal values.
 
+#### `either.getOrElse`
+```hs
+:: Either a b ~> b -> b
+```
+Returns the right value if the instance is a `Right`, otherwise the provided 
+default value will be returned.
+
 #### `either.toString`
 ```hs
 :: Either a b ~> () -> String

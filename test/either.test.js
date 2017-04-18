@@ -138,6 +138,21 @@ describe('Either', function() {
 
   });
 
+  describe('#getOrElse', function() {
+    it('returns the default value if the instance is a `left`', function() {
+      jsv.assert(jsv.forall(leftArb(jsv.nat), jsv.nat, function(e, d) {
+        return e.getOrElse(d) === d;
+      }));
+    });
+
+    it('returns the right value if the instance is a `right`', function() {
+      jsv.assert(jsv.forall(rightArb(jsv.nat), jsv.nat, function(e, d) {
+        return e.getOrElse(d) === e.value;
+      }));
+    });
+
+  });
+
   describe('.either', function() {
     it('returns the value of a Left after applying the first function arg', function() {
       jsv.assert(jsv.forall(leftArb(jsv.nat), fnNatArb, fnNatArb, function(e, f, g) {
