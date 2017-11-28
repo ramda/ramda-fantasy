@@ -42,7 +42,7 @@
     "jsverify": "^0.7.1",
     "mocha": "^2.1.0",
     "promise": "7.1.1",
-    "uglify-js": "2.4.x",
+    "uglify-js": "2.6.x",
     "xyz": "0.5.x"
   }
 }
