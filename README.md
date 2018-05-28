@@ -17,7 +17,7 @@ Specifically, we suggest these replacements:
 * Tuple: [fantasyland/fantasy-tuples](https://github.com/fantasyland/fantasy-tuples)
 * Reader: [fantasyland/fantasy-readers](https://github.com/fantasyland/fantasy-readers)
 * IO: [fantasyland/fantasy-io](https://github.com/fantasyland/fantasy-io)
-* Identity: [fantasyland/fantasy-identities](https://github.com/fantasyland/fantasy-identities)
+* Identity: [sanctuary-js/sanctuary-identity](https://github.com/sanctuary-js/sanctuary-identity)
 
 ## Available types
 
