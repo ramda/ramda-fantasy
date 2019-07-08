@@ -36,7 +36,7 @@ lookup('foo', { abc: 'bar' }).getOrElse('baz'); // 'baz'
 //                                        -- with the provided function,
 //                                        -- otherwise return the default value
 plus1or0 = M.maybe(0, R.inc);
-plus1or0(safeDiv(42, 2)); // 22
+plus1or0(safeDiv(42, 2)); // 21
 plus1or0(safeDiv(42, 0)); // 0
 ```
 
