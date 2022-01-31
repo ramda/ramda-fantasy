@@ -1,5 +1,6 @@
 var toString = require('ramda/src/toString');
 var equals = require('ramda/src/equals');
+var Z = require('sanctuary-type-classes');
 
 
 function Tuple(x, y) {
@@ -21,14 +22,6 @@ function _Tuple(x, y) {
   this.length = 2;
 }
 
-function ensureConcat(xs) {
-  xs.forEach(function(x) {
-    if (typeof x.concat != 'function') {
-      throw new TypeError(toString(x) + ' must be a semigroup to perform this operation');
-    }
-  });
-}
-
 Tuple.fst = function(x) {
   return x[0];
 };
@@ -41,8 +34,7 @@ _Tuple.prototype['@@type'] = 'ramda-fantasy/Tuple';
 
 // semigroup
 _Tuple.prototype.concat = function(x) {
-  ensureConcat([this[0], this[1]]);
-  return Tuple(this[0].concat(x[0]), this[1].concat(x[1]));
+  return Tuple(Z.concat(this[0], x[0]), Z.concat(this[1], x[1]));
 };
 
 // functor
@@ -52,8 +44,7 @@ _Tuple.prototype.map = function(f) {
 
 // apply
 _Tuple.prototype.ap = function(m) {
-  ensureConcat([this[0]]);
-  return Tuple(this[0].concat(m[0]), this[1](m[1]));
+  return Tuple(Z.concat(this[0], m[0]), this[1](m[1]));
 };
 
 // setoid
@@ -64,5 +55,8 @@ _Tuple.prototype.equals = function(that) {
 _Tuple.prototype.toString = function() {
   return 'Tuple(' + toString(this[0]) + ', ' + toString(this[1]) + ')';
 };
+
+require('./internal/fl-patch')([_Tuple, _Tuple.prototype]);
+
 
 module.exports = Tuple;

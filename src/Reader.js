@@ -2,7 +2,9 @@ var compose = require('ramda/src/compose');
 var identity = require('ramda/src/identity');
 var toString = require('ramda/src/toString');
 var always = require('ramda/src/always');
+var Z = require('sanctuary-type-classes');
 
+var patchAll = require('./internal/fl-patch');
 
 function Reader(run) {
   if (!(this instanceof Reader)) {
@@ -25,15 +27,15 @@ Reader.prototype.chain = function(f) {
 };
 
 Reader.prototype.ap = function(a) {
-  return this.chain(function(f) {
-    return a.map(f);
-  });
+  return Z.chain(function(f) {
+    return Z.map(f, a);
+  }, this);
 };
 
 Reader.prototype.map = function(f) {
-  return this.chain(function(a) {
-    return Reader.of(f(a));
-  });
+  return Z.chain(function(a) {
+    return Z.of(Reader, f(a));
+  }, this);
 };
 
 Reader.prototype.of = function(a) {
@@ -63,7 +65,7 @@ Reader.T = function(M) {
 
   ReaderT.prototype.of = ReaderT.of = function(a) {
     return ReaderT(function() {
-      return M.of(a);
+      return Z.of(M, a);
     });
   };
 
@@ -71,22 +73,22 @@ Reader.T = function(M) {
     var readerT = this;
     return ReaderT(function(e) {
       var m = readerT.run(e);
-      return m.chain(function(a) {
+      return Z.chain(function(a) {
         return f(a).run(e);
-      });
+      }, m);
     });
   };
 
   ReaderT.prototype.map = function(f) {
-    return this.chain(function(a) {
-      return ReaderT.of(f(a));
-    });
+    return Z.chain(function(a) {
+      return Z.of(ReaderT, f(a));
+    }, this);
   };
 
   ReaderT.prototype.ap = function(a) {
     var readerT = this;
     return ReaderT(function(e) {
-      return readerT.run(e).ap(a.run(e));
+      return Z.ap(readerT.run(e), a.run(e));
     });
   };
 
@@ -94,7 +96,11 @@ Reader.T = function(M) {
     return 'ReaderT[' + M.name + '](' + toString(this.run) + ')';
   };
 
+  patchAll([ReaderT, ReaderT.prototype]);
+
   return ReaderT;
 };
+
+patchAll([Reader, Reader.prototype]);
 
 module.exports = Reader;

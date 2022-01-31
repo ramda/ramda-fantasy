@@ -1,5 +1,6 @@
 var compose = require('ramda/src/compose');
 var toString = require('ramda/src/toString');
+var Z = require('sanctuary-type-classes');
 
 var util = require('./internal/util');
 
@@ -42,9 +43,9 @@ IO.prototype.map = function(f) {
 // `this` IO must wrap a function `f` that takes an IO (`thatIo`) as input
 // `f` must return an IO
 IO.prototype.ap = function(thatIo) {
-  return this.chain(function(f) {
-    return thatIo.map(f);
-  });
+  return Z.chain(function(f) {
+    return Z.map(f, thatIo);
+  }, this);
 };
 
 IO.runIO = function(io) {
@@ -64,3 +65,5 @@ IO.of = IO.prototype.of;
 IO.prototype.toString = function() {
   return 'IO(' + toString(this.fn) + ')';
 };
+
+require('./internal/fl-patch')([IO, IO.prototype]);
